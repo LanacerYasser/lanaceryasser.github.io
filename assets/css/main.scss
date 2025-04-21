@@ -19,7 +19,7 @@ $sans-serif: 'Linux Libertine', Georgia, serif !default;
 $monospace: 'Linux Libertine', 'Courier New', monospace !default;
 
 // ✅ Optional: tweak link color (if desired)
-$link-color: red !default;
+$link-color: pink !default;
 
 // ✅ Type scale (unchanged, unless you want to modify)
 $type-size-1: 2.441em !default;
@@ -45,7 +45,7 @@ $h-size-6: 1em !default;
 
 // ✅ Make sure HTML base font size is applied
 html {
-  font-size: $type-size-5;
+  font-size: $type-size-4;
 }
 
 td {
