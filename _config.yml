@@ -17,7 +17,7 @@ author:
 
 # Theme and Build Settings
 remote_theme: "mmistakes/minimal-mistakes"
-minimal_mistakes_skin: "neon"
+minimal_mistakes_skin: "dark"
 
 plugins:
   - jekyll-feed
@@ -54,7 +54,6 @@ defaults:
 # Exclude from processing
 exclude:
   - Gemfile
-  - _theme/
   - Gemfile.lock
   - node_modules/
   - vendor/
