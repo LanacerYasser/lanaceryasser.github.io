@@ -17,7 +17,7 @@ author:
 
 # Theme and Build Settings
 remote_theme: "mmistakes/minimal-mistakes"
-minimal_mistakes_skin: "mint"
+minimal_mistakes_skin: "dark"
 
 plugins:
   - jekyll-feed
