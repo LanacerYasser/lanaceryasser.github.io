@@ -17,10 +17,12 @@ author:
 
 # Theme and Build Settings
 remote_theme: "mmistakes/minimal-mistakes-jekyll"
+theme: "minimal-mistakes-jekyll"
 minimal_mistakes_skin: "neon"
 
 plugins:
   - jekyll-feed
+  # - jekyll-remote-theme
 
 # Sidebar Settings
 show_sidebar: true
