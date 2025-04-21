@@ -30,6 +30,7 @@ show_sidebar: true
 sidebar:
   nav: "sidebar-nav" # You can create _data/navigation.yml for this
 
+
 # Layout Defaults
 defaults:
   - scope:
@@ -42,6 +43,7 @@ defaults:
         comments: true
         share: true
         related: true
+        math : true
   - scope:
       path: ""
       type: pages
