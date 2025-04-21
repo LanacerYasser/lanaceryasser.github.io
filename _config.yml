@@ -53,6 +53,10 @@ exclude:
   - node_modules/
   - vendor/
   - _site/
+  - .git/
+  - .github/
+  - .gitignore
+  - README.md
 
 # Optional social / SEO / analytics config
 github_username: lanaceryasser
