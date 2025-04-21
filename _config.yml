@@ -54,6 +54,7 @@ defaults:
 # Exclude from processing
 exclude:
   - Gemfile
+  - _themes/
   - Gemfile.lock
   - node_modules/
   - vendor/
