@@ -18,6 +18,8 @@ author:
 # Theme and Build Settings
 remote_theme: "mmistakes/minimal-mistakes"
 minimal_mistakes_skin: "dark"
+sass :
+  style : compressed
 
 plugins:
   - jekyll-feed
