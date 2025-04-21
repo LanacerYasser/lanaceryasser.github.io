@@ -1,0 +1,40 @@
+_site
+.sass-cache
+.jekyll-cache
+.jekyll-metadata
+vendor
+
+# Ignore site output
+_site/
+.sass-cache/
+.jekyll-cache/
+
+# Ignore dependencies
+.bundle/
+vendor/
+node_modules/
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+.DS_Store
+*.bak
+*.backup
+
+# Ignore Ruby environment files
+Gemfile.lock
+
+# Ignore VSCode or JetBrains project files
+.vscode/
+.idea/
+
+# Ignore OS-specific files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Ignore environment variables file
+.env
+

@@ -1,0 +1,55 @@
+title: Koyphshi
+description: "Just another cyber wizard."
+url: "https://lanaceryasser.github.io" # Change if you're using a custom domain
+baseurl: "" # Leave empty if using username.github.io, else set to "/repo-name"
+
+# Author Profile
+author:
+  name        : "Koyphshi"
+  avatar      : "/assets/images/perfect.jpeg"
+  bio         : "B333333."
+  location    : "Somewhere, DZ"
+  links:
+    - label: "GitHub"
+      icon: "fab fa-github"
+      url: "https://github.com/lanaceryasser"
+    # Add more if needed (Twitter, LinkedIn, etc.)
+
+# Theme and Build Settings
+theme: minimal-mistakes-jekyll
+minimal_mistakes_skin: "neon"
+
+plugins:
+  - jekyll-feed
+
+# Sidebar Settings
+show_sidebar: true
+sidebar:
+  nav: "sidebar-nav" # You can create _data/navigation.yml for this
+
+# Layout Defaults
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      author_profile: true
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: single
+      author_profile: true
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/
+  - _site/
+
+# Optional social / SEO / analytics config
+github_username: lanaceryasser
+
