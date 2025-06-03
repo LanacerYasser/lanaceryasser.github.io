@@ -6,11 +6,12 @@
 
 // ✅ Import custom font (CDN version)
 @font-face {
-  font-family: 'Linux Libertine';
+  font-family: 'Courier Prime'; /* Example monospaced font */
   font-style: normal;
   font-weight: 400;
-  src: url('https://fonts.cdnfonts.com/s/282/LinLibertine_Re-4.1_.8_.woff') format('woff');
+  src: url('https://fonts.cdnfonts.com/s/33359/CourierPrime-Regular.woff') format('woff');
 }
+
 
 // ✅ Set the main font to Linux Libertine
 $sans-serif: 'Linux Libertine', Georgia, serif !default;
