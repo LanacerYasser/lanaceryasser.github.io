@@ -1,24 +1,70 @@
-title: "jekyll-shell-theme"
-tagline: "A jekyll theme that looks like a shell/terminal"
-description: "This is a preview of jekyll-shell-theme."
-github_username: tareqdandachi
-baseurl: "/jekyll-shell-theme"
-url: "https://tareqdandachi.github.io"
+title: Koyphshi
+description: "Just another cyber wizard."
+url: "https://lanaceryasser.github.io" # Change if you're using a custom domain
+baseurl: "" # Leave empty if using username.github.io, else set to "/repo-name"
+
+# Author Profile
+author:
+  name        : "Koyphshi"
+  avatar      : "/assets/images/perfect.jpeg"
+  bio         : "B333333."
+  location    : "Somewhere, DZ"
+  links:
+    - label: "GitHub"
+      icon: "fab fa-github"
+      url: "https://github.com/lanaceryasser"
+    # Add more if needed (Twitter, LinkedIn, etc.)
+
+# Theme and Build Settings
+remote_theme: "mmistakes/minimal-mistakes"
+minimal_mistakes_skin: "dark"
+sass :
+  style : compressed
 
 plugins:
-  - jemoji
-  - jekyll-sitemap
-  - jekyll-seo-tag
+  - jekyll-feed
+  # - jekyll-seo-tag
+  # - jekyll-remote-theme
+  - jekyll-include-cache
 
-sass:
-  style: compressed
+# Sidebar Settings
+show_sidebar: true
+sidebar:
+  nav: "sidebar-nav" # You can create _data/navigation.yml for this
 
-highlighter: rouge
 
-header_pages:
-  - index.md
-  - read-me.md
-  - preview.md
+# Layout Defaults
+defaults:
+  - scope:
+      path: ""
+      type: posts
+      values:
+        layout: single
+        author_profile: true
+        read_time: true
+        comments: true
+        share: true
+        related: true
+        math : true
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: single
+      author_profile: true
 
-# set the size of the text to 'large' or 'small', default is small
-font-size: small
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/
+  - _site/
+  - .git/
+  - .github/
+  - .gitignore
+  - README.md
+
+# Optional social / SEO / analytics config
+github_username: lanaceryasser
+

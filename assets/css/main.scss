@@ -1,67 +1,69 @@
 ---
-  # Style-Sheet
+# Only the main Sass file needs front matter (the dashes are enough)
 ---
 
-/* FONTS */
 @charset "utf-8";
-@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700');
-@import url('syntax-highlighting.css');
 
-:root {
-
-  --main-color: white;
-  --bg-color: black;
-
-  --text-color: #DDD;
-  --pop-color: white;
-  --alt-color: #2ed573;
-  --light-alt-color: rgba(46, 213, 115);
-
+// ✅ Import custom font (CDN version)
+@font-face {
+  font-family: 'Courier Prime'; /* Example monospaced font */
+  font-style: normal;
+  font-weight: 400;
+  src: url('https://fonts.cdnfonts.com/s/33359/CourierPrime-Regular.woff') format('woff');
 }
 
-/* BASE */
-body { background-color: var(--bg-color); color: var(--main-color); font-family: 'Roboto Mono', monospace; margin: 0 auto; width: 90%; max-width: 700px; line-height: 2em; font-size: 0.9em; }
-h1, h2, h3, h4, h5, h6 {  margin: 0px;  margin-top: 22px;  font-weight: bold;  color: var(--pop-color); font-size: 1em; }
-p, ul, ol { font-size: 1em;  color: var(--text-color); }
-a { text-decoration: underline;  color: var(--alt-color); }
-a:hover { color: var(--bg-color); background-color: var(--alt-color); }
-.primary-text { color: var(--main-color); }
-@media only screen and (max-device-width: 500px) { * { font-size: 12px !important; } }
-b, strong { color: var(--main-color); }
-.invert { color: var(--bg-color); background-color: var(--main-color); padding-left: 3px; padding-right: 3px; padding-top: 1px; padding-bottom: 1px; }
 
-/* SMALL FONT OVERRIDE */
-body.large { line-height: 2em; font-size: 1em; }
+// ✅ Set the main font to Linux Libertine
+$sans-serif: 'Linux Libertine', Georgia, serif !default;
 
-/* LAYOUT */
-.container { margin-right: auto;  margin-left: auto; }
-p { word-wrap: break-word;  word-break: break-word;  white-space: pre-wrap; }
-footer { color: var(--text-color);  border-top: dashed 1px rgba(219, 219, 219, 0.9);  margin: 20px auto 15px;  padding-top: 10px;  text-align: right; }
-header { margin-top: 25px;  margin-bottom: 10px; }
-header p { text-align: left;  margin: 0; }
-footer { margin-bottom: 20px; }
-img.home_header { width: 100%; margin-top: 5%; margin-bottom: 5%; }
-img.detail_header { width: 100%; }
+// (Optional) You can define a monospace fallback too if needed:
+$monospace: 'Linux Libertine', 'Courier New', monospace !default;
 
-/* LISTS */
-:not(.menu) > ul { list-style: none; padding-left: 1em; }
-ul :not(.menu) > ul { list-style: none; padding-left: 3em; margin-top: 0.5em; margin-bottom: 0.7em; }
-:not(.menu) > ul { list-style-type: none; }
-:not(.menu) > ul > li:before { content: "-";  margin-right: 9px; }
-ul :not(.menu) > ul > li:before { content: "*";  margin-right: 9px; }
+// ✅ Optional: tweak link color (if desired)
+$link-color: pink !default;
 
-/* NAVIGATION */
-.menu { border-top: dashed 1px rgba(219, 219, 219, 0.9);  border-bottom: dashed 1px rgba(219, 219, 219, 0.9);  margin-bottom: 25px; }
-.menu ul { margin-top: 12px;  margin-bottom: 12px;  padding-left: 0px;  list-style-type: none;  text-align: right; }
-.menu ul li { display: inline;  margin-left: 10px; }
-.menu ul li a { text-decoration: none;  color: var(--text-color); }
-.menu ul li a:hover { text-decoration: none; color: var(--bg-color); background-color: var(--main-color); }
-.menu ul li.page_title { text-align: left; margin-left: 10px; float: left; font-weight: bold; color: var(--main-color) }
+// ✅ Type scale (unchanged, unless you want to modify)
+$type-size-1: 2.441em !default;
+$type-size-2: 1.953em !default;
+$type-size-3: 1.563em !default;
+$type-size-4: 1.25em !default;
+$type-size-5: 1.1em !default;
+$type-size-6: 0.8em !default;
+$type-size-7: 0.8em !default;
+$type-size-8: 0.625em !default;
 
+// ✅ Headline sizes
+$h-size-1: 1.563em !default;
+$h-size-2: 1.25em !default;
+$h-size-3: 1.125em !default;
+$h-size-4: 1.0625em !default;
+$h-size-5: 1.03125em !default;
+$h-size-6: 1em !default;
 
-/* ERROR PAGES */
+// ✅ Import skin + base theme AFTER variable overrides
+@import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}";
+@import "minimal-mistakes";
 
-div.error_box { margin: 100px; text-align: center; }
-div.error_box h1 { font-size: 2em; }
+// ✅ Make sure HTML base font size is applied
+html {
+  font-size: $type-size-4;
+}
 
-*::selection { background-color: var(--light-alt-color); color: black; }
+td {
+  font-size: $type-size-5;
+}
+
+table.imgtable, table.imgtable td {
+  border: none;
+  text-align: left;
+}
+
+// ✅ Code block customization (using same font)
+.highlight {
+  margin: 0;
+  padding: 0.5em;
+  font-family: 'Linux Libertine', monospace;
+  font-size: $type-size-5;
+  line-height: 1.8;
+}
+
