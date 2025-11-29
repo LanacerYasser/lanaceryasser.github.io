@@ -1,5 +1,5 @@
 ---
-title: "Vrai Sahl"
+title: "Vrai Sahll"
 date: 2025-05-26T00:00:00+00:00
 draft: false
 author: "Koyphshi"
