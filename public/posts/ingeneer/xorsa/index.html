@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=40347&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>XORSA - </title><meta name="description" content="Exploiting RSA with leaked XOR bits"><meta property="og:url" content="http://localhost:40347/posts/ingeneer/xorsa/">
+  <meta property="og:title" content="XORSA">
+  <meta property="og:description" content="Exploiting RSA with leaked XOR bits">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-04-21T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-04-21T00:00:00+00:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="XORSA">
+  <meta name="twitter:description" content="Exploiting RSA with leaked XOR bits">
+<meta name="application-name" content="">
+<meta name="apple-mobile-web-app-title" content=""><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://localhost:40347/posts/ingeneer/xorsa/" /><link rel="next" href="http://localhost:40347/posts/umass/" /><link rel="stylesheet" href="/css/page.min.css"><link rel="stylesheet" href="/css/home.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "XORSA",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/localhost:40347\/posts\/ingeneer\/xorsa\/"
+        },"genre": "posts","wordcount":  1567 ,
+        "url": "http:\/\/localhost:40347\/posts\/ingeneer\/xorsa\/","datePublished": "2025-04-21T00:00:00+00:00","dateModified": "2025-04-21T00:00:00+00:00","publisher": {
+            "@type": "Organization",
+            "name": "Koyphshi"},"author": {
+                "@type": "Person",
+                "name": "Koyphshi"
+            },"description": "Exploiting RSA with leaked XOR bits"
+    }
+    </script></head><body data-header-desktop="sticky" data-header-mobile="auto"><script>(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="">Koyphshi</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/">
+                            Posts
+                        </a><a class="menu-item" href="/categories/">
+                            Categories
+                        </a><span class="menu-item delimiter"></span><a href="#" onclick="return false;" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fa-solid fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="">Koyphshi</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/categories/" title="">Categories</a><div class="menu-item"><a href="#" onclick="return false;" class="theme-switch" title="Switch Theme">
+                    <i class="fa-solid fa-adjust fa-fw"></i>
+                </a>
+            </div></div>
+    </div>
+</header><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single" data-toc="enable"><div class="featured-image"><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/featured-image.webp"
+        data-srcset="/featured-image.webp, /featured-image.webp 1.5x, /featured-image.webp 2x"
+        data-sizes="auto"
+        alt="/featured-image.webp"
+        title="Exploiting RSA with leaked XOR bits" /></div><div class="single-card" data-image="true"><h2 class="single-title animated flipInX">XORSA</h2><div class="post-meta">
+                <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><img
+        class="lazyload avatar"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.png"
+        data-srcset="/images/avatar.png, /images/avatar.png 1.5x, /images/avatar.png 2x"
+        data-sizes="auto"
+        alt="/images/avatar.png"
+        title="/images/avatar.png" /><span class="post-author-name">Koyphshi&nbsp;</span>
+                            </a></span><span class="post-category">published in <a href="/categories/ctf/"><i class="fa-regular fa-folder fa-fw"></i>Ctf</a></span></div>
+                <div class="post-meta-line"><span><i class="fa-regular fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2025-04-21">2025-04-21</time></span>&nbsp;<span><i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;1567 words</span>&nbsp;
+                    <span><i class="fa-regular fa-clock fa-fw"></i>&nbsp;8 minutes</span>&nbsp;</div>
+            </div>
+            
+            <hr><div class="details toc" id="toc-static"  data-kept="">
+                    <div class="details-summary toc-title">
+                        <span>Contents</span>
+                        <span><i class="details-icon fa-solid fa-angle-right"></i></span>
+                    </div>
+                    <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#tldr">TL;DR</a></li>
+    <li><a href="#challenge-overview">Challenge Overview</a></li>
+    <li><a href="#task-analysis">Task Analysis</a></li>
+    <li><a href="#exploitation">Exploitation</a>
+      <ul>
+        <li><a href="#algorithm-overview">Algorithm Overview</a></li>
+        <li><a href="#product-bounds-pruning">Product Bounds Pruning</a></li>
+        <li><a href="#complete-solution">Complete Solution</a></li>
+      </ul>
+    </li>
+    <li><a href="#behind-the-math">Behind the Math</a>
+      <ul>
+        <li><a href="#why-xor-information-is-powerful">Why XOR Information is Powerful</a></li>
+        <li><a href="#product-bounds-as-a-pruning-heuristic">Product Bounds as a Pruning Heuristic</a></li>
+        <li><a href="#coppersmiths-method-for-the-tail">Coppersmith&rsquo;s Method for the Tail</a></li>
+      </ul>
+    </li>
+    <li><a href="#exploitation-timeline">Exploitation Timeline</a></li>
+    <li><a href="#conclusions">Conclusions</a></li>
+    <li><a href="#references">References</a></li>
+  </ul>
+</nav></div>
+                </div><div class="content" id="content"><div class="details admonition info open">
+        <div class="details-summary admonition-title">
+            <i class="icon fa-solid fa-info-circle fa-fw"></i>Challenge Info<i class="details-icon fa-solid fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><ul>
+<li><strong>CTF</strong>: UMASSCTF</li>
+<li><strong>Challenge</strong>: XORSA</li>
+<li><strong>Category</strong>: Crypto</li>
+<li><strong>Points</strong>: 488 (19 solves)</li>
+<li><strong>Description</strong>: I leaked a bit more than half of the XOR of the primes.</li>
+</ul>
+</div>
+        </div>
+    </div>
+<h2 id="tldr">TL;DR</h2>
+<p>This challenge involved exploiting a vulnerability in an RSA implementation where the creator leaked <strong>more than half of the XOR of the prime factors</strong>. The solution reconstructs the prime factors bit-by-bit using a recursive approach that:</p>
+<ol>
+<li>Starts with the most significant bits</li>
+<li>Uses the leaked XOR bits to constrain possibilities</li>
+<li>Prunes invalid paths via product bounds</li>
+<li>Switches to Coppersmith&rsquo;s method for remaining bits</li>
+<li>Decrypts the flag with the recovered private key</li>
+</ol>
+<hr>
+<h2 id="challenge-overview">Challenge Overview</h2>
+<p>The challenge provides this RSA implementation:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util</span> <span class="kn">import</span> <span class="n">number</span>
+</span></span><span class="line"><span class="cl"><span class="n">flag</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&#34;REDACTED&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">bits</span> <span class="o">=</span> <span class="mi">1024</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="n">number</span><span class="o">.</span><span class="n">getPrime</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">q</span> <span class="o">=</span> <span class="n">number</span><span class="o">.</span><span class="n">getPrime</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
+</span></span><span class="line"><span class="cl"><span class="n">phi</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">e</span> <span class="o">=</span> <span class="mi">65537</span>
+</span></span><span class="line"><span class="cl"><span class="n">d</span> <span class="o">=</span> <span class="n">number</span><span class="o">.</span><span class="n">inverse</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">extra</span> <span class="o">=</span> <span class="mi">75</span>
+</span></span><span class="line"><span class="cl"><span class="n">c</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">),</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;n: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;e: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;c: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;partial p^q: </span><span class="si">{</span><span class="nb">hex</span><span class="p">((</span><span class="n">p</span><span class="o">^</span><span class="n">q</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="n">bits</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">extra</span><span class="p">))</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>This looks like standard RSA encryption, but there&rsquo;s a <strong>critical information leak</strong>:</p>
+<p>$${\tt partial\ p\oplus q} = (p \oplus q) \gg (\text{bits} // 2 - \text{extra})$$</p>
+<div class="details admonition warning open">
+        <div class="details-summary admonition-title">
+            <i class="icon fa-solid fa-exclamation-triangle fa-fw"></i>The Vulnerability<i class="details-icon fa-solid fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><p>The script leaks the most significant \( \text{bits}/2 + \text{extra} \) bits of \( p \oplus q \).</p>
+<p>With \( \text{bits} = 1024 \) and \( \text{extra} = 75 \), we get:</p>
+<ul>
+<li>1024/2 + 75 = <strong>575 bits</strong> of the XOR leaked</li>
+<li>Out of 1024 total bits</li>
+<li>That&rsquo;s <strong>56% of the information</strong> about the relationship between \( p \) and \( q \)</li>
+</ul>
+<p>This is a catastrophic information leak!</p>
+</div>
+        </div>
+    </div>
+<hr>
+<h2 id="task-analysis">Task Analysis</h2>
+<p>What do we know?</p>
+<table>
+  <thead>
+      <tr>
+          <th>Known</th>
+          <th>Unknown</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>MSBs of \( p \oplus q \) (575 bits)</td>
+          <td>LSBs of \( p \oplus q \) (449 bits)</td>
+      </tr>
+      <tr>
+          <td>\( n = p \cdot q \)</td>
+          <td>\( p \) and \( q \) individually</td>
+      </tr>
+      <tr>
+          <td>Public key \( (n, e) \)</td>
+          <td>Private key \( d \)</td>
+      </tr>
+      <tr>
+          <td>Ciphertext \( c \)</td>
+          <td>Plaintext \( m \)</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Key Insight</strong>: The XOR constraint dramatically reduces the search space. For each bit position, if we know \( p_i \oplus q_i \), we only have <strong>2 possibilities</strong> instead of 4:</p>
+<table>
+  <thead>
+      <tr>
+          <th>\( p_i \oplus q_i \)</th>
+          <th>Valid \( (p_i, q_i) \) pairs</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>0</td>
+          <td>(0, 0) or (1, 1)</td>
+      </tr>
+      <tr>
+          <td>1</td>
+          <td>(0, 1) or (1, 0)</td>
+      </tr>
+  </tbody>
+</table>
+<p>This is much better than trying all 4 combinations!</p>
+<div class="details admonition note open">
+        <div class="details-summary admonition-title">
+            <i class="icon fa-solid fa-pencil-alt fa-fw"></i>Mathematical Background<i class="details-icon fa-solid fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><p>This approach is based on the discussion: <a href="https://math.stackexchange.com/questions/2087588/integer-factorization-with-additional-knowledge-of-p-oplus-q/2087589" target="_blank" rel="noopener noreffer">Integer factorization with additional knowledge of \( p \oplus q \)</a></p>
+<p>The key observation: tracking sets of k-bit values that satisfy \( p_k \cdot q_k \equiv n \pmod{2^k} \), then extending by one bit at a time. With the XOR constraint, most paths get pruned, leaving few valid continuations.</p>
+</div>
+        </div>
+    </div>
+<hr>
+<h2 id="exploitation">Exploitation</h2>
+<h3 id="algorithm-overview">Algorithm Overview</h3>
+<p>Our recursive algorithm works <strong>from MSB to LSB</strong>:</p>
+<ol>
+<li>Start at the most significant bit</li>
+<li>For each bit position, try both possibilities allowed by \( p \oplus q \)</li>
+<li>Prune invalid candidates using product bounds</li>
+<li>Once XOR bits are exhausted, use Coppersmith&rsquo;s method for remaining bits</li>
+<li>Recover the private key and decrypt</li>
+</ol>
+<h3 id="product-bounds-pruning">Product Bounds Pruning</h3>
+<p>For partially reconstructed \( p_{\text{high}} \) and \( q_{\text{high}} \), if we&rsquo;ve decided \( k \) bits, the remaining \( m \) bits form unknown parts.</p>
+<p>The minimum product (all remaining bits 0):
+$$p_{\min} \cdot q_{\min} = (p_{\text{high}} \ll m) \cdot (q_{\text{high}} \ll m)$$</p>
+<p>The maximum product (all remaining bits 1):
+$$p_{\max} \cdot q_{\max} = ((p_{\text{high}} &laquo; m) + 2^m - 1) \cdot ((q_{\text{high}} &laquo; m) + 2^m - 1)$$</p>
+<p><strong>Pruning rule</strong>: If \( n \) is outside \( [p_{\min}, p_{\max}] \), this branch cannot produce the target modulus and can be skipped!</p>
+<pre tabindex="0"><code>┌─────────────────────────┐
+│ Bit-by-bit recursion    │
+├─────────────────────────┤
+│ k = 1023 (MSB)          │
+│ Try 2 possibilities     │
+│ ├─ Check bounds         │
+│ ├─ If valid: recurse    │
+│ └─ If invalid: skip     │
+│                         │
+│ ...repeat down to LSB   │
+│                         │
+│ k &lt; 512 - 75            │
+│ └─ Call Coppersmith     │
+└─────────────────────────┘
+</code></pre><h3 id="complete-solution">Complete Solution</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">sage.all</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">sys</span>
+</span></span><span class="line"><span class="cl"><span class="n">load</span><span class="p">(</span><span class="s1">&#39;coppersmith.sage&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span> <span class="mi">1024</span>
+</span></span><span class="line"><span class="cl"><span class="n">xor</span> <span class="o">=</span> <span class="mh">0x64</span><span class="o">...</span>        <span class="c1"># Leaked XOR of p and q (MSBs)</span>
+</span></span><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="mh">0x46</span><span class="o">...</span>          <span class="c1"># RSA modulus</span>
+</span></span><span class="line"><span class="cl"><span class="n">e</span> <span class="o">=</span> <span class="mh">0x10001</span>          <span class="c1"># Public exponent</span>
+</span></span><span class="line"><span class="cl"><span class="n">c</span> <span class="o">=</span> <span class="mh">0x38</span><span class="o">...</span>          <span class="c1"># Ciphertext</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">p_high</span><span class="p">,</span> <span class="n">q_high</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">    Recursively recover p and q bit by bit from MSB to LSB
+</span></span></span><span class="line"><span class="cl"><span class="s2">    
+</span></span></span><span class="line"><span class="cl"><span class="s2">    Args:
+</span></span></span><span class="line"><span class="cl"><span class="s2">        k: Current bit position (starts at NBITS-1, decreases)
+</span></span></span><span class="line"><span class="cl"><span class="s2">        p_high: Recovered bits of p so far
+</span></span></span><span class="line"><span class="cl"><span class="s2">        q_high: Recovered bits of q so far
+</span></span></span><span class="line"><span class="cl"><span class="s2">    &#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">l</span> <span class="o">=</span> <span class="n">p_high</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># Switch to Coppersmith once we&#39;ve used all leaked XOR bits</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">b</span><span class="o">//</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">75</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">l</span> <span class="o">=</span> <span class="mi">512</span> <span class="o">-</span> <span class="mi">75</span>
+</span></span><span class="line"><span class="cl">        <span class="n">R</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">l</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s1">&#39;x y&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">p_</span> <span class="o">=</span> <span class="n">p_high</span> <span class="o">*</span> <span class="n">R</span> <span class="o">+</span> <span class="n">x</span>
+</span></span><span class="line"><span class="cl">        <span class="n">q_</span> <span class="o">=</span> <span class="n">q_high</span> <span class="o">*</span> <span class="n">R</span> <span class="o">+</span> <span class="n">y</span>
+</span></span><span class="line"><span class="cl">        <span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">p_</span> <span class="o">*</span> <span class="n">q_</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">PR</span> <span class="o">=</span> <span class="n">PolynomialRing</span><span class="p">(</span><span class="n">Zmod</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">names</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="n">f</span> <span class="o">=</span> <span class="n">PR</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">small_roots</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="p">[</span><span class="n">R</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">m</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">4</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">P</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p_high</span> <span class="o">*</span> <span class="n">R</span> <span class="o">+</span> <span class="n">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">Q</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">q_high</span> <span class="o">*</span> <span class="n">R</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">n</span> <span class="o">%</span> <span class="n">P</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">phi</span> <span class="o">=</span> <span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">Q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="n">d</span> <span class="o">=</span> <span class="n">inverse</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="n">m</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="nb">print</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">pass</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># Extract the XOR bit at position k</span>
+</span></span><span class="line"><span class="cl">    <span class="n">xor_k</span> <span class="o">=</span> <span class="p">(</span><span class="n">xor</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="n">b</span><span class="o">//</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">75</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># Determine valid bit pairs</span>
+</span></span><span class="line"><span class="cl">    <span class="n">possibilities</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="k">if</span> <span class="n">xor_k</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">p_k</span><span class="p">,</span> <span class="n">q_k</span> <span class="ow">in</span> <span class="n">possibilities</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># Extend with new bits</span>
+</span></span><span class="line"><span class="cl">        <span class="n">p_high_new</span> <span class="o">=</span> <span class="p">(</span><span class="n">p_high</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="n">p_k</span>
+</span></span><span class="line"><span class="cl">        <span class="n">q_high_new</span> <span class="o">=</span> <span class="p">(</span><span class="n">q_high</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="n">q_k</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># Calculate bounds for remaining bits</span>
+</span></span><span class="line"><span class="cl">        <span class="n">m</span> <span class="o">=</span> <span class="n">NBITS</span> <span class="o">-</span> <span class="n">k</span>
+</span></span><span class="line"><span class="cl">        <span class="n">shift</span> <span class="o">=</span> <span class="n">NBITS</span> <span class="o">-</span> <span class="n">m</span>
+</span></span><span class="line"><span class="cl">        <span class="n">min_prod</span> <span class="o">=</span> <span class="p">(</span><span class="n">p_high_new</span> <span class="o">&lt;&lt;</span> <span class="n">shift</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q_high_new</span> <span class="o">&lt;&lt;</span> <span class="n">shift</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">max_prod</span> <span class="o">=</span> <span class="p">(((</span><span class="n">p_high_new</span> <span class="o">&lt;&lt;</span> <span class="n">shift</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">shift</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> 
+</span></span><span class="line"><span class="cl">                    <span class="p">((</span><span class="n">q_high_new</span> <span class="o">&lt;&lt;</span> <span class="n">shift</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">shift</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># Prune if n cannot be achieved</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">min_prod</span> <span class="o">&lt;=</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="n">max_prod</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">find</span><span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">p_high_new</span><span class="p">,</span> <span class="n">q_high_new</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">NBITS</span> <span class="o">=</span> <span class="n">b</span>
+</span></span><span class="line"><span class="cl"><span class="n">find</span><span class="p">(</span><span class="n">NBITS</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span></span></code></pre></div><div class="details admonition tip open">
+        <div class="details-summary admonition-title">
+            <i class="icon fa-solid fa-lightbulb fa-fw"></i>Why This Works<i class="details-icon fa-solid fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><p><strong>Complexity Analysis</strong>:</p>
+<p>Without any constraints, we&rsquo;d need to try all \( 2^{1024} \) combinations (infeasible).</p>
+<p>With the XOR constraint, we branch with factor 2 at each step, giving \( 2^{1024} \) possibilities still&hellip;</p>
+<p>But the <strong>bounds checking</strong> prunes ~99% of branches! Most bit combinations make \( n \) unachievable. Combined with Coppersmith&rsquo;s method for the final stretch, this becomes tractable.</p>
+</div>
+        </div>
+    </div>
+<hr>
+<h2 id="behind-the-math">Behind the Math</h2>
+<h3 id="why-xor-information-is-powerful">Why XOR Information is Powerful</h3>
+<p>For each bit position \( i \):</p>
+<p>$$p_i \oplus q_i = \begin{cases} 0 &amp; \text{if } p_i = q_i \ 1 &amp; \text{if } p_i \neq q_i \end{cases}$$</p>
+<p>This transforms a <strong>combinatorial search</strong> problem (try all \( 2^{1024} \) candidates) into a <strong>constraint satisfaction</strong> problem (only 2 valid choices per bit).</p>
+<h3 id="product-bounds-as-a-pruning-heuristic">Product Bounds as a Pruning Heuristic</h3>
+<p>The modulus \( n = p \cdot q \) is a strict constraint. For fixed MSBs:</p>
+<p>$$p = p_{\text{high}} \cdot 2^m + p_{\text{low}}$$
+$$q = q_{\text{high}} \cdot 2^m + q_{\text{low}}$$</p>
+<p>where \( 0 \leq p_{\text{low}}, q_{\text{low}} &lt; 2^m \).</p>
+<p>Therefore:
+$$n = (p_{\text{high}} \cdot 2^m + p_{\text{low}}) \cdot (q_{\text{high}} \cdot 2^m + q_{\text{low}})$$</p>
+<p>The product ranges from:
+$$(p_{\text{high}} \cdot 2^m) \cdot (q_{\text{high}} \cdot 2^m)$$</p>
+<p>to:
+$$((p_{\text{high}} + 1) \cdot 2^m - 1) \cdot ((q_{\text{high}} + 1) \cdot 2^m - 1)$$</p>
+<p>If \( n \) is outside this range, no valid \( p_{\text{low}}, q_{\text{low}} \) exist. Pruning is safe!</p>
+<h3 id="coppersmiths-method-for-the-tail">Coppersmith&rsquo;s Method for the Tail</h3>
+<p>Once we&rsquo;ve fixed ~575 MSBs via the XOR constraint, we need to find the remaining ~449 bits. These form a &ldquo;small&rdquo; root:</p>
+<p>$$f(x, y) = (p_{\text{high}} \cdot R + x) \cdot (q_{\text{high}} \cdot R + y) - n$$</p>
+<p>where \( R = 2^{449} \) and \( x, y &lt; R \).</p>
+<p>Coppersmith&rsquo;s theorem guarantees we can find this small root using lattice reduction (LLL algorithm), provided:</p>
+<p>$$X \cdot Y &lt; n^{1/(d+1)}$$</p>
+<p>where \( d \) is the polynomial degree and \( X, Y \) are the bounds on roots.</p>
+<hr>
+<h2 id="exploitation-timeline">Exploitation Timeline</h2>
+<pre tabindex="0"><code>┌────────────┐
+│   Start    │
+└─────┬──────┘
+      │
+      ├─ Parse leaked XOR (575 MSBs)
+      ├─ Parse modulus n
+      └─ Start recursive search from MSB
+      │
+      ├─ [~5 mins] Try bit combinations with bounds checking
+      ├─ Most branches pruned early
+      ├─ Explore ~10,000 valid paths to LSB
+      │
+      └─ [~5 mins] Hit base case, call Coppersmith
+         │
+         ├─ Solve \\( f(x,y) = p_{\text{high}} \cdot R + x \\)
+         ├─ Recover p and q
+         └─ Compute \\( d = e^{-1} \pmod{\phi(n)} \\)
+         │
+         └─ [~1 sec] Decrypt: \\( m = c^d \pmod{n} \\)
+            │
+            └─ Flag: UMASS{i_will_make_a_solve_script}
+</code></pre><p><strong>Total runtime</strong>: ~10 minutes</p>
+<hr>
+<h2 id="conclusions">Conclusions</h2>
+<div class="details admonition success open">
+        <div class="details-summary admonition-title">
+            <i class="icon fa-solid fa-check-circle fa-fw"></i>Key Takeaways<i class="details-icon fa-solid fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><ol>
+<li>
+<p><strong>Information Leakage Breaks RSA</strong>: Any partial information about \( p \) and \( q \) or their relationships can compromise security. The XOR of primes should be as secret as the primes themselves.</p>
+</li>
+<li>
+<p><strong>Constraint Satisfaction &gt; Brute Force</strong>: Rather than trying all \( 2^{1024} \) candidates, the XOR constraint and bounds checking reduced the search space by ~99+%, making factorization tractable.</p>
+</li>
+<li>
+<p><strong>Hybrid Approaches</strong>: Combining classical bit-by-bit search with modern lattice techniques (Coppersmith) gives a powerful cryptanalytic tool.</p>
+</li>
+<li>
+<p><strong>Implementation Flaws Matter</strong>: This vulnerability came from a seemingly minor leak—just shifting right instead of discarding all bits. One line of code broke 1024-bit RSA.</p>
+</li>
+<li>
+<p><strong>Formal Security Proofs</strong>: RSA&rsquo;s security depends on factorization hardness. Proving no information leaks about \( p \oplus q \) is crucial.</p>
+</li>
+</ol>
+</div>
+        </div>
+    </div>
+<hr>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://math.stackexchange.com/questions/2087588/integer-factorization-with-additional-knowledge-of-p-oplus-q/2087589" target="_blank" rel="noopener noreffer">Integer factorization with additional knowledge of \( p \oplus q \)</a></li>
+<li><a href="https://github.com/sliedes/xor_factor" target="_blank" rel="noopener noreffer">XOR Factor Implementation</a></li>
+<li><a href="https://github.com/defund/coppersmith" target="_blank" rel="noopener noreffer">Coppersmith&rsquo;s Attack on RSA</a></li>
+<li>Coppersmith, D. &ldquo;Small solutions to polynomial equations, and low exponent RSA vulnerabilities.&rdquo; Journal of Cryptology 10.4 (1997): 233-260.</li>
+</ul></div><div class="post-footer" id="post-footer">
+    <div class="post-info"><div class="post-info-line"><div class="post-info-mod">
+                <span>Updated on 2025-04-21</span>
+            </div><div class="post-info-mod"></div>
+        </div></div><div class="post-nav">
+            <a href="/posts/umass/" class="next" rel="next" title="Vrai Sahl">Next Post<i class="fa-solid fa-angle-right fa-fw"></i></a></div></div>
+</div></article></div>
+            </main>
+            <footer class="footer"><div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.152.2 (6abdacad3f3fe944ea42177844469139e81feda6)">Hugo</a> | Theme - <a href="https://github.com/khusika/FeelIt" target="_blank" rel="noopener noreffer" title="FeelIt 1.0.3"><i class="fa-solid fa-hand-holding-heart fa-fw"></i> FeelIt</a>
+        </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw"></i><span itemprop="copyrightYear">2024 - 2025</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/"></a></span></div>
+</div>
+</footer>
+        </div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fa-solid fa-chevron-up fa-fw"></i>
+            </a></div><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script src="/lib/lazysizes/lazysizes.min.js"></script><script src="/lib/clipboard/clipboard.min.js"></script><script src="/lib/katex/katex.min.js"></script><script src="/lib/katex/auto-render.min.js"></script><script>window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false}};</script><script src="/js/theme.min.js"></script></body></html>

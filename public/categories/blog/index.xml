@@ -1,0 +1,37 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Blog - Category - Your Blog Title</title>
+        <link>http://localhost:1313/categories/blog/</link>
+        <description>Blog - Category - Your Blog Title</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 26 May 2025 00:00:00 &#43;0000</lastBuildDate><atom:link href="http://localhost:1313/categories/blog/" rel="self" type="application/rss+xml" /><item>
+    <title>Vrai Sahl</title>
+    <link>http://localhost:1313/posts/vrai-sahl/</link>
+    <pubDate>Mon, 26 May 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/vrai-sahl/</guid>
+    <description><![CDATA[<h2 id="challenge-overview">Challenge Overview</h2>
+<ul>
+<li><strong>CTF</strong>: Ingeneer</li>
+<li><strong>Challenge</strong>: Vrai Sahl</li>
+<li><strong>Category</strong>: Crypto</li>
+<li><strong>Points</strong>: Hard</li>
+<li><strong>Description</strong>: I didn’t have much time, so I made an easy challenge but labeled it hard—kind of like calling a first-year spell a N.E.W.T.-level exam. Sorry for the mix-up!</li>
+</ul>
+<h2 id="tldr">TL;DR</h2>
+<p>This challenge presented a hybrid encryption scheme combining RSA and Elliptic Curve Cryptography (ECC). The primary vulnerability lay in the RSA prime generation, where a significant portion of the least significant bits (LSBs) of both prime factors was generated using a predictable pattern. This allowed for a partial reconstruction of the primes using a brute-force approach on the second nibble of each byte. Once enough bits of the RSA primes were recovered, Coppersmith&rsquo;s method was applied to find the remaining unknown high bits. With one of the RSA primes fully recovered, the flag, which was hidden as a common root of two polynomials (one derived from the hybrid encryption and another from the ECC point doubling formula), was found by computing the GCD of these polynomials.</p>]]></description>
+</item>
+<item>
+    <title>XORSA</title>
+    <link>http://localhost:1313/posts/xorsa/</link>
+    <pubDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/xorsa/</guid>
+    <description><![CDATA[<h2 id="challenge-overview">Challenge Overview</h2>
+<ul>
+<li><strong>CTF</strong>: UMASSCTF</li>
+<li><strong>Challenge</strong>: XORSA</li>
+<li><strong>Category</strong>: Crypto</li>
+<li><strong>Points</strong>: 488 (19 solves)</li>
+<li><strong>Description</strong>: I leaked a bit more than half of the XOR of the primes.</li>
+</ul>
+<h2 id="tldr">TL;DR</h2>
+<p>This challenge involved exploiting a vulnerability in an RSA implementation where the creator leaked more than half of the XOR of the prime factors. We constructed a solution that bit-by-bit reconstructed the prime factors. The solve implements a recursive approach that starts with the most significant bits and works downward, using the leaked XOR bits to guide prime factor recovery. At each step, we check possible bit combinations that satisfy the $$p \oplus q$$ constraint and prune search paths that can&rsquo;t produce the known modulus $$n$$. Once enough bits are recovered, we use lattice reduction to solve for the remaining bits, compute the private key, and decrypt the flag.</p>]]></description>
+</item>
+</channel>
+</rss>

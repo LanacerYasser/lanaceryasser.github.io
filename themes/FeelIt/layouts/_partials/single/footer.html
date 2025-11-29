@@ -1,0 +1,124 @@
+{{- $params := .Scratch.Get "params" -}}
+
+<div class="post-footer" id="post-footer">
+    <div class="post-info">
+        {{- with .Params.tags -}}
+        <div class="post-info-tag">
+            {{- range $index, $value := . -}}
+                <span>
+                {{- $tag := partialCached "function/path.html" $value $value | printf "/tags/%v" | $.Site.GetPage -}}
+                <a href="{{ $tag.RelPermalink }}">{{ $tag.Title }}</a>
+                </span>
+            {{- end -}}
+        </div>
+        {{- end -}}
+        <div class="post-info-line">
+            {{- with .Site.Params.dateformat | default "2006-01-02" | .Lastmod.Format -}}
+            <div class="post-info-mod">
+                <span>
+                {{- dict "Date" . | T "updatedOnDate" -}}
+                {{- if $.Site.Params.gitRepo -}}
+                    {{- with $.GitInfo -}}
+                        &nbsp;<a class="git-hash" href="{{ printf `%v/commit/%v` $.Site.Params.gitRepo .Hash }}" target="_blank" title="committed&nbsp;by&nbsp;{{ .AuthorName }}({{ .AuthorEmail }})&nbsp;{{- .AbbreviatedHash -}}:&nbsp;{{ .Subject }}">
+                            <i class="fa-solid fa-hashtag fa-fw"></i>{{- .AbbreviatedHash -}}
+                        </a>
+                    {{- end -}}
+                {{- end -}}
+                </span>
+            </div>
+            {{- end -}}
+            <div class="post-info-mod">
+                {{- if $params.linktomarkdown -}}
+                    {{- with .OutputFormats.Get "markdown" -}}
+                        <span>
+                            <a class="link-to-markdown" href="{{ .RelPermalink }}" target="_blank">
+                                {{- T "readMarkdown" -}}
+                            </a>
+                        </span>
+                    {{- end -}}
+                {{- end -}}
+                {{- if $params.improvearticle -}}
+                    <span>
+                        &nbsp;|&nbsp;
+                        <a class="link-to-markdown" href="{{$params.improvearticle}}{{path.Clean .File.Path}}" target="_blank">
+                            {{- T "improveArticle" -}}
+                        </a>
+                    </span>
+                {{- end -}}
+            </div>
+        </div>
+        {{- if .Site.Params.page.share.enable -}}
+        <div class="post-info-share">
+            <span>
+                {{- partial "plugin/share.html" . -}}
+            </span>
+        </div>
+        {{- end -}}
+    </div>
+
+    {{- /* Related Content */ -}}
+    {{- $related := .Site.RegularPages.Related . | first 5 -}}
+    {{- with $related -}}
+        <div class="related-content">
+            <h3 class="related-title">{{ T "relatedContent" | default "See Also" }}</h3>
+            <div class="related-posts">
+                {{- range . -}}
+                    <a class="related-post" href="{{ .RelPermalink }}">
+                        {{- $image := "" -}}
+                        {{- with .Params.featuredimagepreview | default .Params.featuredImagePreview -}}
+                            {{- $image = . | relURL -}}
+                        {{- else -}}
+                            {{- with .Resources.GetMatch "featured-image-preview" -}}
+                                {{- $image = (.Fill "68x68 Center q100 Lanczos").RelPermalink -}}
+                            {{- else -}}
+                                {{- range .Params.resources -}}
+                                    {{- if eq .name "featured-image-preview" -}}
+                                        {{- $image = .src | relURL -}}
+                                    {{- end -}}
+                                {{- end -}}
+                            {{- end -}}
+                        {{- end -}}
+                        {{- if not $image -}}
+                            {{- with .Params.featuredimage | default .Params.featuredImage -}}
+                                {{- $image = . | relURL -}}
+                            {{- else -}}
+                                {{- with .Resources.GetMatch "featured-image" -}}
+                                    {{- $image = (.Fill "68x68 Center q100 Lanczos").RelPermalink -}}
+                                {{- else -}}
+                                    {{- range .Params.resources -}}
+                                        {{- if eq .name "featured-image" -}}
+                                            {{- $image = .src | relURL -}}
+                                        {{- end -}}
+                                    {{- end -}}
+                                {{- end -}}
+                            {{- end -}}
+                        {{- end -}}
+                        {{- if $image -}}
+                            <div class="related-post-image">
+                                <img src="{{ $image }}" alt="{{ .Title }}" loading="lazy">
+                            </div>
+                        {{- else -}}
+                            <div class="related-post-image-placeholder">
+                                <i class="fa-solid fa-newspaper"></i>
+                            </div>
+                        {{- end -}}
+                        <div class="related-post-content">
+                            <span class="related-post-title">{{ .Title }}</span>
+                        </div>
+                    </a>
+                {{- end -}}
+            </div>
+        </div>
+    {{- end -}}
+
+    {{- if .Section -}}
+    <div class="post-nav">
+        {{- if .PrevInSection -}}
+            <a href="{{ .PrevInSection.RelPermalink }}" class="prev" rel="prev" title="{{ .PrevInSection.Title }}"><i class="fa-solid fa-angle-left fa-fw"></i>Previous Post</a>
+        {{- end -}}
+        {{ if .NextInSection }}
+            <a href="{{ .NextInSection.RelPermalink }}" class="next" rel="next" title="{{ .NextInSection.Title }}">Next Post<i class="fa-solid fa-angle-right fa-fw"></i></a>
+        {{- end -}}
+    </div>
+    {{- end -}}
+</div>

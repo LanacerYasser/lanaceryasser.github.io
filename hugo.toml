@@ -1,0 +1,77 @@
+baseURL = "https://lanaceryasser.github.io/"
+title = ""
+languageCode = "en"
+defaultContentLanguage = "en"
+theme = "FeelIt"
+
+# Enable GitInfo for last modified dates
+enableGitInfo = false 
+
+[params]
+  version = "1.0.X"
+  description = "Your blog description"
+  keywords = ["blog", "tech", "your keywords"]
+  defaultTheme = "auto"  # auto, light, dark
+  
+  [params.header]
+    desktopMode = "sticky"
+    mobileMode = "auto"
+    
+    [params.header.title]
+      logo = ""
+      name = "Koyphshi"
+      pre = ""
+      post = ""
+      typeit = false
+
+  [params.page.math]
+  enable = true 
+
+  [params.footer]
+    enable = true
+    custom = ""
+    hugo = true
+    copyright = true
+    author = true
+    since = 2024
+
+  [params.home]
+    [params.home.profile]
+      enable = true
+      avatarURL = "/images/avatar.jpeg"
+      title = "Koyphshi"
+      subtitle = "ps ps ps"
+      typeit = true
+      social = true
+      
+    [params.home.posts]
+      enable = true
+      paginate = 6
+      imagePreview = true
+
+  [params.social]
+    GitHub = "LanacerYasser"
+    LinkedIn = "https://www.linkedin.com/in/yasser-lanacer-1903442a8/"
+    # Add more social links
+
+[menu]
+  [[menu.main]]
+    identifier = "posts"
+    name = "Posts"
+    url = "/posts/"
+    weight = 1
+ [[menu.main]]
+    identifier = "categories"
+    name = "Categories"
+    url = "/categories/"
+    weight = 3
+  [[menu.main]]
+    identifier = "tags"
+    name = "tags"
+    url = "/tags/"
+    weight = 3
+ 
+
+[markup]
+  [markup.highlight]
+    noClasses = false

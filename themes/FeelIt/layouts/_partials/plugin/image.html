@@ -1,0 +1,42 @@
+{{- /* lazysizes and lightgallery.js */ -}}
+{{- $scratch := newScratch -}}
+{{- range $key, $path := dict "src" .Src "small" .SrcSmall "large" .SrcLarge -}}
+    {{- if $path -}}
+        {{- $url := $path -}}
+        {{- with dict "Path" $path "Resources" $.Resources | partial "function/resource.html" -}}
+            {{- $url = .Permalink -}}
+        {{- else -}}
+            {{- if not (urls.Parse $path).IsAbs -}}
+                {{- $url = $path | relURL -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $scratch.Set $key $url -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $src := $scratch.Get "src" -}}
+{{- $small := $scratch.Get "small" | default $src -}}
+{{- $large := $scratch.Get "large" | default $src -}}
+
+{{- $alt := .Alt | default $src -}}
+{{- $loading := resources.Get "svg/loading.svg" | minify -}}
+{{- if .Linked -}}
+    <a class="lightgallery" href="{{ $large | safeURL }}" title="{{ .Title | default $alt }}" data-thumbnail="{{ $small | safeURL }}"{{ with .Caption }} data-sub-html="<h2>{{ . }}</h2>{{ with $.Title }}<p>{{ . }}</p>{{ end }}"{{ end }}{{ with .Rel }} rel="{{ . }}"{{ end }}>
+        <img
+            class="lazyload{{ with .Class }} {{ . }}{{ end }}"
+            src="{{ $loading.RelPermalink }}"
+            data-src="{{ $src | safeURL }}"
+            data-srcset="{{ $small | safeURL }}, {{ $src | safeURL }} 1.5x, {{ $large | safeURL }} 2x"
+            data-sizes="auto"
+            alt="{{ $alt }}"{{ with .Height }} height="{{ . }}"{{ end }}{{ with .Width }} width="{{ . }}"{{ end }} />
+    </a>
+{{- else -}}
+    <img
+        class="lazyload{{ with .Class }} {{ . }}{{ end }}"
+        src="{{ $loading.RelPermalink }}"
+        data-src="{{ $src | safeURL }}"
+        data-srcset="{{ $small | safeURL }}, {{ $src | safeURL }} 1.5x, {{ $large | safeURL }} 2x"
+        data-sizes="auto"
+        alt="{{ $alt }}"
+        title="{{ .Title | default $alt }}"{{ with .Height }} height="{{ . }}"{{ end }}{{ with .Width }} width="{{ . }}"{{ end }} />
+{{- end -}}
