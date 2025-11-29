@@ -1,12 +1,12 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
         <title>Umass - Tag - </title>
-        <link>https://lanaceryasser.github.io/tags/umass/</link>
+        <link>http://localhost:41301/tags/umass/</link>
         <description>Umass - Tag - </description>
-        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</lastBuildDate><atom:link href="https://lanaceryasser.github.io/tags/umass/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</lastBuildDate><atom:link href="http://localhost:41301/tags/umass/" rel="self" type="application/rss+xml" /><item>
     <title>XORSA</title>
-    <link>https://lanaceryasser.github.io/posts/umass/</link>
-    <pubDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</pubDate><guid>https://lanaceryasser.github.io/posts/umass/</guid>
+    <link>http://localhost:41301/posts/umass/</link>
+    <pubDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:41301/posts/umass/</guid>
     <description><![CDATA[Exploiting RSA with leaked XOR bits]]></description>
 </item>
 </channel>
