@@ -1,20 +1,20 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
         <title></title>
-        <link>http://localhost:40347/</link>
+        <link>https://lanaceryasser.github.io/</link>
         <description>Your blog description</description>
         <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 26 May 2025 00:00:00 &#43;0000</lastBuildDate>
-            <atom:link href="http://localhost:40347/index.xml" rel="self" type="application/rss+xml" />
+            <atom:link href="https://lanaceryasser.github.io/index.xml" rel="self" type="application/rss+xml" />
         <item>
     <title>Vrai Sahl</title>
-    <link>http://localhost:40347/posts/ingeneer/</link>
-    <pubDate>Mon, 26 May 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:40347/posts/ingeneer/</guid>
+    <link>https://lanaceryasser.github.io/posts/ingeneer/</link>
+    <pubDate>Mon, 26 May 2025 00:00:00 &#43;0000</pubDate><guid>https://lanaceryasser.github.io/posts/ingeneer/</guid>
     <description><![CDATA[<p>Breaking a hybrid RSA-ECC cryptosystem through weak prime generation.</p>]]></description>
 </item>
 <item>
     <title>XORSA</title>
-    <link>http://localhost:40347/posts/umass/</link>
-    <pubDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:40347/posts/umass/</guid>
+    <link>https://lanaceryasser.github.io/posts/umass/</link>
+    <pubDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</pubDate><guid>https://lanaceryasser.github.io/posts/umass/</guid>
     <description><![CDATA[Exploiting RSA with leaked XOR bits]]></description>
 </item>
 </channel>
