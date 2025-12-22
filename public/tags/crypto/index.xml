@@ -1,26 +1,14 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
-        <title>All Posts - </title>
-        <link>http://localhost:1313/posts/</link>
-        <description>All Posts | </description>
-        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 22 Dec 2025 00:00:00 &#43;0000</lastBuildDate><atom:link href="http://localhost:1313/posts/" rel="self" type="application/rss+xml" /><item>
+        <title>Crypto - Tag - </title>
+        <link>http://localhost:1313/tags/crypto/</link>
+        <description>Crypto - Tag - </description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 22 Dec 2025 00:00:00 &#43;0000</lastBuildDate><atom:link href="http://localhost:1313/tags/crypto/" rel="self" type="application/rss+xml" /><item>
     <title>Geni: Breaking CSIDH via Torsion Point Leakage</title>
     <link>http://localhost:1313/posts/bsides/</link>
     <pubDate>Mon, 22 Dec 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/bsides/</guid>
     <description><![CDATA[<p>Last weekend, I participated in <strong>BSides Algiers CTF</strong>, hosted by <strong>Shellmates</strong>, and I was able to win <strong>1st place</strong>! I solved all the cryptography challenges, and this writeup will be for the one I found to be the most interesting and hardest: <strong>Geni</strong>.</p>
 <p>At first, I couldn&rsquo;t understand isogenies very well, but by reading from the <a href="https://cryptohack.org/challenges/isogenies/" target="_blank" rel="noopener noreffer">CryptoHack Isogeny Challenges</a>, I got a basic understanding that allowed me to start reading the challenge files and understand the underlying mechanics.</p>]]></description>
-</item>
-<item>
-    <title>Vrai Sahll</title>
-    <link>http://localhost:1313/posts/ingeneer/</link>
-    <pubDate>Mon, 26 May 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/ingeneer/</guid>
-    <description><![CDATA[<p>Breaking a hybrid RSA-ECC cryptosystem through weak prime generation.</p>]]></description>
-</item>
-<item>
-    <title>XORSA</title>
-    <link>http://localhost:1313/posts/umass/</link>
-    <pubDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/umass/</guid>
-    <description><![CDATA[Exploiting RSA with leaked XOR bits]]></description>
 </item>
 </channel>
 </rss>

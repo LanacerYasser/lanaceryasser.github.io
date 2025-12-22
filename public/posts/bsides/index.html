@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Geni - </title><meta name="description" content="Exploiting a CSI-FiSh variant by tracking torsion points through a sequence of leaked generator images."><meta property="og:url" content="http://localhost:1313/posts/bsides/">
+  <meta property="og:title" content="Geni">
+  <meta property="og:description" content="Exploiting a CSI-FiSh variant by tracking torsion points through a sequence of leaked generator images.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-12-22T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-12-22T00:00:00+00:00">
+    <meta property="article:tag" content="Isogeny">
+    <meta property="article:tag" content="Crypto">
+    <meta property="article:tag" content="Csidh">
+    <meta property="article:tag" content="Weil-Pairing">
+    <meta property="og:image" content="http://localhost:1313/posts/bsides/featured-image_hu_a44b4b44971bcb74.webp">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/posts/bsides/featured-image_hu_a44b4b44971bcb74.webp">
+  <meta name="twitter:title" content="Geni">
+  <meta name="twitter:description" content="Exploiting a CSI-FiSh variant by tracking torsion points through a sequence of leaked generator images.">
+<meta name="application-name" content="">
+<meta name="apple-mobile-web-app-title" content=""><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://localhost:1313/posts/bsides/" /><link rel="prev" href="http://localhost:1313/posts/ingeneer/" /><link rel="stylesheet" href="/css/page.min.css"><link rel="stylesheet" href="/css/home.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Geni",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/localhost:1313\/posts\/bsides\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "http:\/\/localhost:1313\/posts\/bsides\/featured-image.webp",
+                            "width":  303 ,
+                            "height":  166 
+                        }],"genre": "posts","keywords": "isogeny, crypto, csidh, weil-pairing","wordcount":  1193 ,
+        "url": "http:\/\/localhost:1313\/posts\/bsides\/","datePublished": "2025-12-22T00:00:00+00:00","dateModified": "2025-12-22T00:00:00+00:00","publisher": {
+            "@type": "Organization",
+            "name": "Koyphshi"},"author": {
+                "@type": "Person",
+                "name": "Koyphshi"
+            },"description": "Exploiting a CSI-FiSh variant by tracking torsion points through a sequence of leaked generator images."
+    }
+    </script></head><body data-header-desktop="sticky" data-header-mobile="auto"><script>(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="">Koyphshi</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/">
+                            Posts
+                        </a><a class="menu-item" href="/categories/">
+                            Categories
+                        </a><a class="menu-item" href="/tags/">
+                            tags
+                        </a><span class="menu-item delimiter"></span><a href="#" onclick="return false;" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fa-solid fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="">Koyphshi</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item" href="/tags/" title="">tags</a><div class="menu-item"><a href="#" onclick="return false;" class="theme-switch" title="Switch Theme">
+                    <i class="fa-solid fa-adjust fa-fw"></i>
+                </a>
+            </div></div>
+    </div>
+</header><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single" data-toc="enable"><div class="featured-image"><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/posts/bsides/featured-image.webp"
+        data-srcset="/posts/bsides/featured-image.webp, /posts/bsides/featured-image.webp 1.5x, /posts/bsides/featured-image.webp 2x"
+        data-sizes="auto"
+        alt="/posts/bsides/featured-image.webp"
+        title="Exploiting a CSI-FiSh variant by tracking torsion points through a sequence of leaked generator images." /></div><div class="single-card" data-image="true"><h2 class="single-title animated flipInX">Geni</h2><div class="post-meta">
+                <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><img
+        class="lazyload avatar"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.jpeg"
+        data-srcset="/images/avatar.jpeg, /images/avatar.jpeg 1.5x, /images/avatar.jpeg 2x"
+        data-sizes="auto"
+        alt="/images/avatar.jpeg"
+        title="/images/avatar.jpeg" /><span class="post-author-name">Koyphshi&nbsp;</span>
+                            </a></span><span class="post-category">published in <a href="/categories/ctf/"><i class="fa-regular fa-folder fa-fw"></i>Ctf</a></span></div>
+                <div class="post-meta-line"><span><i class="fa-regular fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2025-12-22">2025-12-22</time></span>&nbsp;<span><i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;1193 words</span>&nbsp;
+                    <span><i class="fa-regular fa-clock fa-fw"></i>&nbsp;6 minutes</span>&nbsp;</div>
+            </div>
+            
+            <hr><div class="details toc" id="toc-static"  data-kept="">
+                    <div class="details-summary toc-title">
+                        <span>Contents</span>
+                        <span><i class="details-icon fa-solid fa-angle-right"></i></span>
+                    </div>
+                    <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#file-analysis">File Analysis</a></li>
+    <li><a href="#detailed-vulnerability-analysis">Detailed Vulnerability Analysis</a>
+      <ul>
+        <li><a href="#1-torsion-point-leakage">1. Torsion Point Leakage</a></li>
+        <li><a href="#2-the-linear-sequence-leak">2. The Linear Sequence Leak</a></li>
+      </ul>
+    </li>
+    <li><a href="#behind-the-math">Behind the Math</a>
+      <ul>
+        <li><a href="#frobenius-eigenspaces-and-kernels">Frobenius Eigenspaces and Kernels</a></li>
+        <li><a href="#the-weil-pairing">The Weil Pairing</a></li>
+      </ul>
+    </li>
+    <li><a href="#exploitation-process">Exploitation Process</a>
+      <ul>
+        <li><a href="#step-1-reconstructing-the-curves">Step 1: Reconstructing the Curves</a></li>
+        <li><a href="#step-2-tracking-torsion-images">Step 2: Tracking Torsion Images</a></li>
+        <li><a href="#step-3-recovering-the-exponents">Step 3: Recovering the Exponents</a></li>
+      </ul>
+    </li>
+    <li><a href="#full-solver-script">Full Solver Script</a></li>
+  </ul>
+</nav></div>
+                </div><div class="content" id="content"><p>Last weekend, I participated in <strong>BSides Algiers CTF</strong>, hosted by <strong>Shellmates</strong>, and I was able to win <strong>1st place</strong>! I managed to solve all the cryptography challenges. This writeup focuses on the one I found to be the most interesting and hardest: <strong>Geni</strong>.</p>
+<p>At first, I didn&rsquo;t have a deep understanding of isogenies, but by reading the <a href="https://cryptohack.org/challenges/isogenies/" target="_blank" rel="noopener noreffer">CryptoHack Isogeny Challenges</a>, I gained a basic understanding that allowed me to start reading the challenge files and understand the underlying mechanics.</p>
+<div class="details admonition info open">
+        <div class="details-summary admonition-title">
+            <i class="icon fa-solid fa-info-circle fa-fw"></i>Challenge Info<i class="details-icon fa-solid fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><ul>
+<li><strong>CTF</strong>: BSides Algiers 2025</li>
+<li><strong>Challenge</strong>: Geni</li>
+<li><strong>Category</strong>: Crypto</li>
+<li><strong>Description</strong>: what about an isogeny challenge?</li>
+<li><strong>Author</strong>: scalio</li>
+</ul>
+</div>
+        </div>
+    </div>
+<h2 id="file-analysis">File Analysis</h2>
+<p>The challenge provided several SageMath files that implemented the cryptosystem:</p>
+<ol>
+<li><strong><code>CSIDH.sage</code></strong>: Contains the core logic for the Commutative Supersingular Isogeny Diffie-Hellman (CSIDH) group action over 74 small primes.</li>
+<li><strong><code>scheme.sage</code></strong>: The main logic for the signature scheme. It defines key generation, Fiat-Shamir signing, and verification. It defines the structure of the public key.</li>
+<li><strong><code>HKZbasis.sage</code></strong>: Provides lattice reduction functions (LLL/BKZ) to find short vectors in the relation basis of the class group, ensuring secret keys are manageable.</li>
+<li><strong><code>out.txt</code></strong>: The challenge output containing the <code>Points_list</code> (public keys), parameters, message signature, and the encrypted flag.</li>
+</ol>
+<hr>
+<h2 id="detailed-vulnerability-analysis">Detailed Vulnerability Analysis</h2>
+<p>The vulnerability is a combination of <strong>Torsion Point Leakage</strong> and a <strong>Linear Secret Sequence</strong>.</p>
+<h3 id="1-torsion-point-leakage">1. Torsion Point Leakage</h3>
+<p>In standard CSIDH, a public key is just the target curve $E$. However, <code>scheme.sage</code> discloses the images of the generators $Q_1$ and $Q_2$ of the base curve $E_0$ under the secret isogeny $\Phi$:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="s2">&#34;Points_list&#34;</span><span class="p">:</span> <span class="p">[(</span><span class="n">P</span><span class="o">.</span><span class="n">xy</span><span class="p">()</span> <span class="p">,</span> <span class="n">PP</span><span class="o">.</span><span class="n">xy</span><span class="p">())</span> <span class="k">for</span> <span class="n">_</span> <span class="p">,</span> <span class="n">P</span> <span class="p">,</span> <span class="n">PP</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PK</span><span class="p">]</span>
+</span></span></code></pre></div><p>This disclosure is fatal. In isogeny-based cryptography, knowing where a torsion basis $(Q_1, Q_2)$ maps allows an attacker to compute the image of <strong>any</strong> point $T$ in the torsion group $E_0[p+1]$. If $T = uQ_1 + vQ_2$, then $\Phi(T) = u\Phi(Q_1) + v\Phi(Q_2)$.</p>
+<h3 id="2-the-linear-sequence-leak">2. The Linear Sequence Leak</h3>
+<p>The secret key is a list of 16 vectors (<code>SK</code>) where each vector is derived linearly:
+$$ SK[j] = SK[j-1] + \text{quick} \quad \text{where} \quad \text{quick} = -\text{sign}(SK[1]) $$
+This means that for every prime lane $\ell_i$, the exponent $v_i$ is slowly counting down toward zero across the 16 curves provided in the public key. This allows us to &ldquo;read&rdquo; the secret exponents by watching when the image of a torsion point stops being zero.</p>
+<hr>
+<h2 id="behind-the-math">Behind the Math</h2>
+<h3 id="frobenius-eigenspaces-and-kernels">Frobenius Eigenspaces and Kernels</h3>
+<p>In CSIDH, the group action by a prime ideal $\mathfrak{l}_i$ corresponds to an isogeny whose kernel is a subgroup of the $\ell_i$-torsion $E_0[\ell_i]$. On a supersingular curve over $\mathbb{F}_p$, the $\ell_i$-torsion splits into two eigenspaces under the Frobenius endomorphism $\pi$:</p>
+<ol>
+<li><strong>Positive Eigenspace ($T^+$):</strong> Points where $\pi(T) = T$.</li>
+<li><strong>Negative Eigenspace ($T^-$):</strong> Points where $\pi(T) = -T$.</li>
+</ol>
+<p>If the secret exponent $v_i$ is positive, the isogeny $\Phi$ &ldquo;swallows&rdquo; the positive eigenspace. This means $\Phi(T^+) = 0$ (the point at infinity) on the target curve. If $v_i$ is negative, it swallows $T^-$.</p>
+<h3 id="the-weil-pairing">The Weil Pairing</h3>
+<p>To track these points, we must express $T^+$ and $T^-$ as linear combinations of the generators $Q_1, Q_2$. Since we are working with the full $(p+1)$-torsion, we use the <strong>Weil Pairing</strong> $e(\cdot, \cdot)$ to solve the discrete logarithm problem on the torsion group:
+$$ u \equiv \log_{e(Q_1, Q_2)}(e(T, Q_2)) \pmod{\ell_i} $$
+$$ v \equiv \log_{e(Q_1, Q_2)}(e(Q_1, T)) \pmod{\ell_i} $$</p>
+<hr>
+<h2 id="exploitation-process">Exploitation Process</h2>
+<h3 id="step-1-reconstructing-the-curves">Step 1: Reconstructing the Curves</h3>
+<p>We reconstruct the coefficients of the 16 target curves from the coordinates in <code>Points_list</code> by solving the curve equation $y^2 = x^3 + Ax + B$ for $A$ and $B$.</p>
+<h3 id="step-2-tracking-torsion-images">Step 2: Tracking Torsion Images</h3>
+<p>We compute the coefficients $(u, v)$ for the $+1$ and $-1$ torsion points for each prime. We then evaluate their images across the 16 curves to check if they map to the point at infinity:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">get_uv</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">u</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">weil_pairing</span><span class="p">(</span><span class="n">Q2</span><span class="p">,</span> <span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">pairing_base</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">v</span> <span class="o">=</span> <span class="n">Q1</span><span class="o">.</span><span class="n">weil_pairing</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">pairing_base</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">img1_p</span> <span class="o">=</span> <span class="n">up</span> <span class="o">*</span> <span class="n">P_imgs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">vp</span> <span class="o">*</span> <span class="n">PP_imgs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">img1_m</span> <span class="o">=</span> <span class="n">um</span> <span class="o">*</span> <span class="n">P_imgs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">vm</span> <span class="o">*</span> <span class="n">PP_imgs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span></span></code></pre></div><h3 id="step-3-recovering-the-exponents">Step 3: Recovering the Exponents</h3>
+<p>Because the 16 curves count down the exponent to zero, we check how many curves in the sequence map the torsion point to Zero. If it stops being zero at curve $j+1$, the exponent was exactly $j$.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">if</span> <span class="n">img1_p</span><span class="o">.</span><span class="n">is_zero</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">up</span> <span class="o">*</span> <span class="n">P_imgs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">vp</span> <span class="o">*</span> <span class="n">PP_imgs</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">.</span><span class="n">is_zero</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span>
+</span></span><span class="line"><span class="cl">    <span class="n">v_found</span> <span class="o">=</span> <span class="n">count</span>
+</span></span></code></pre></div><p>By repeating this for all 74 primes, we perfectly reconstruct the secret vector $SK[1]$, derive the full $SK$ list, and hash it to obtain the AES key.</p>
+<hr>
+<h2 id="full-solver-script">Full Solver Script</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">hashlib</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">AES</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Util.Padding</span> <span class="kn">import</span> <span class="n">unpad</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">primes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">43</span><span class="p">,</span> <span class="mi">47</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">71</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">          <span class="mi">73</span><span class="p">,</span> <span class="mi">79</span><span class="p">,</span> <span class="mi">83</span><span class="p">,</span> <span class="mi">89</span><span class="p">,</span> <span class="mi">97</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">103</span><span class="p">,</span> <span class="mi">107</span><span class="p">,</span> <span class="mi">109</span><span class="p">,</span> <span class="mi">113</span><span class="p">,</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">131</span><span class="p">,</span> <span class="mi">137</span><span class="p">,</span> <span class="mi">139</span><span class="p">,</span> <span class="mi">149</span><span class="p">,</span> <span class="mi">151</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">          <span class="mi">157</span><span class="p">,</span> <span class="mi">163</span><span class="p">,</span> <span class="mi">167</span><span class="p">,</span> <span class="mi">173</span><span class="p">,</span> <span class="mi">179</span><span class="p">,</span> <span class="mi">181</span><span class="p">,</span> <span class="mi">191</span><span class="p">,</span> <span class="mi">193</span><span class="p">,</span> <span class="mi">197</span><span class="p">,</span> <span class="mi">199</span><span class="p">,</span> <span class="mi">211</span><span class="p">,</span> <span class="mi">223</span><span class="p">,</span> <span class="mi">227</span><span class="p">,</span> <span class="mi">229</span><span class="p">,</span> <span class="mi">233</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">          <span class="mi">239</span><span class="p">,</span> <span class="mi">241</span><span class="p">,</span> <span class="mi">251</span><span class="p">,</span> <span class="mi">257</span><span class="p">,</span> <span class="mi">263</span><span class="p">,</span> <span class="mi">269</span><span class="p">,</span> <span class="mi">271</span><span class="p">,</span> <span class="mi">277</span><span class="p">,</span> <span class="mi">281</span><span class="p">,</span> <span class="mi">283</span><span class="p">,</span> <span class="mi">293</span><span class="p">,</span> <span class="mi">307</span><span class="p">,</span> <span class="mi">311</span><span class="p">,</span> <span class="mi">313</span><span class="p">,</span> <span class="mi">317</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">          <span class="mi">331</span><span class="p">,</span> <span class="mi">337</span><span class="p">,</span> <span class="mi">347</span><span class="p">,</span> <span class="mi">349</span><span class="p">,</span> <span class="mi">353</span><span class="p">,</span> <span class="mi">359</span><span class="p">,</span> <span class="mi">367</span><span class="p">,</span> <span class="mi">373</span><span class="p">,</span> <span class="mi">587</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">prod</span><span class="p">(</span><span class="n">primes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="n">Fp</span> <span class="o">=</span> <span class="n">GF</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">F</span><span class="o">.&lt;</span><span class="n">i</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">GF</span><span class="p">(</span><span class="n">p</span><span class="o">^</span><span class="mi">2</span><span class="p">,</span> <span class="n">modulus</span><span class="o">=</span><span class="n">x</span><span class="o">^</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">E0</span> <span class="o">=</span> <span class="n">EllipticCurve</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">parse_out</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&#34;out.txt&#34;</span><span class="p">,</span> <span class="s2">&#34;r&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">sections</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">current</span> <span class="o">=</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="s1">&#39;:&#39;</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="n">current</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">sections</span><span class="p">[</span><span class="n">current</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">elif</span> <span class="n">current</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">sections</span><span class="p">[</span><span class="n">current</span><span class="p">]</span> <span class="o">+=</span> <span class="n">line</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">    <span class="n">pts_list</span> <span class="o">=</span> <span class="n">sage_eval</span><span class="p">(</span><span class="n">sections</span><span class="p">[</span><span class="s1">&#39;Points_list&#39;</span><span class="p">],</span> <span class="nb">locals</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;i&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hex_res</span> <span class="o">=</span> <span class="n">sections</span><span class="p">[</span><span class="s1">&#39;Hex result&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">pts_list</span><span class="p">,</span> <span class="n">hex_res</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">pts_list</span><span class="p">,</span> <span class="n">hex_res</span> <span class="o">=</span> <span class="n">parse_out</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">Q1_coords</span><span class="p">,</span> <span class="n">Q2_coords</span> <span class="o">=</span> <span class="n">pts_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">Q1</span> <span class="o">=</span> <span class="n">E0</span><span class="p">(</span><span class="n">Q1_coords</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">Q2</span> <span class="o">=</span> <span class="n">E0</span><span class="p">(</span><span class="n">Q2_coords</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">pairing_base</span> <span class="o">=</span> <span class="n">Q1</span><span class="o">.</span><span class="n">weil_pairing</span><span class="p">(</span><span class="n">Q2</span><span class="p">,</span> <span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">E_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">P_imgs</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">PP_imgs</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="o">=</span> <span class="n">pts_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">x1</span><span class="p">),</span> <span class="n">F</span><span class="p">(</span><span class="n">y1</span><span class="p">),</span> <span class="n">F</span><span class="p">(</span><span class="n">x2</span><span class="p">),</span> <span class="n">F</span><span class="p">(</span><span class="n">y2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">A</span> <span class="o">=</span> <span class="p">((</span><span class="n">y1</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="n">x1</span><span class="o">^</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">y2</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="n">x2</span><span class="o">^</span><span class="mi">3</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">B</span> <span class="o">=</span> <span class="n">y1</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="n">x1</span><span class="o">^</span><span class="mi">3</span> <span class="o">-</span> <span class="n">A</span><span class="o">*</span><span class="n">x1</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Ej</span> <span class="o">=</span> <span class="n">EllipticCurve</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="p">[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">E_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Ej</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">P_imgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Ej</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PP_imgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Ej</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">sk1</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;[*] Recovering exponents via Zero-Image analysis...&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">primes</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">xr</span> <span class="o">=</span> <span class="n">Fp</span><span class="o">.</span><span class="n">random_element</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">rhs</span> <span class="o">=</span> <span class="n">xr</span><span class="o">^</span><span class="mi">3</span> <span class="o">+</span> <span class="n">xr</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">is_square</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="n">Tp</span> <span class="o">=</span> <span class="p">((</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="n">l</span><span class="p">)</span> <span class="o">*</span> <span class="n">E0</span><span class="p">(</span><span class="n">xr</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="ow">not</span> <span class="n">Tp</span><span class="o">.</span><span class="n">is_zero</span><span class="p">():</span> <span class="k">break</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">xr</span> <span class="o">=</span> <span class="n">Fp</span><span class="o">.</span><span class="n">random_element</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">rhs</span> <span class="o">=</span> <span class="n">xr</span><span class="o">^</span><span class="mi">3</span> <span class="o">+</span> <span class="n">xr</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_square</span><span class="p">(</span><span class="n">rhs</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="n">Tm</span> <span class="o">=</span> <span class="p">((</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="n">l</span><span class="p">)</span> <span class="o">*</span> <span class="n">E0</span><span class="p">(</span><span class="n">xr</span><span class="p">,</span> <span class="n">i</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="n">rhs</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="ow">not</span> <span class="n">Tm</span><span class="o">.</span><span class="n">is_zero</span><span class="p">():</span> <span class="k">break</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">get_uv</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">u</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">weil_pairing</span><span class="p">(</span><span class="n">Q2</span><span class="p">,</span> <span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">pairing_base</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">v</span> <span class="o">=</span> <span class="n">Q1</span><span class="o">.</span><span class="n">weil_pairing</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">pairing_base</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">up</span><span class="p">,</span> <span class="n">vp</span> <span class="o">=</span> <span class="n">get_uv</span><span class="p">(</span><span class="n">Tp</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">um</span><span class="p">,</span> <span class="n">vm</span> <span class="o">=</span> <span class="n">get_uv</span><span class="p">(</span><span class="n">Tm</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">v_found</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">    <span class="n">img1_p</span> <span class="o">=</span> <span class="n">up</span> <span class="o">*</span> <span class="n">P_imgs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">vp</span> <span class="o">*</span> <span class="n">PP_imgs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">img1_m</span> <span class="o">=</span> <span class="n">um</span> <span class="o">*</span> <span class="n">P_imgs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">vm</span> <span class="o">*</span> <span class="n">PP_imgs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">img1_p</span><span class="o">.</span><span class="n">is_zero</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">        <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="n">up</span> <span class="o">*</span> <span class="n">P_imgs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">vp</span> <span class="o">*</span> <span class="n">PP_imgs</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">.</span><span class="n">is_zero</span><span class="p">():</span> <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">            <span class="k">else</span><span class="p">:</span> <span class="k">break</span>
+</span></span><span class="line"><span class="cl">        <span class="n">v_found</span> <span class="o">=</span> <span class="n">count</span>
+</span></span><span class="line"><span class="cl">    <span class="k">elif</span> <span class="n">img1_m</span><span class="o">.</span><span class="n">is_zero</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">        <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="n">um</span> <span class="o">*</span> <span class="n">P_imgs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">vm</span> <span class="o">*</span> <span class="n">PP_imgs</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">.</span><span class="n">is_zero</span><span class="p">():</span> <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">            <span class="k">else</span><span class="p">:</span> <span class="k">break</span>
+</span></span><span class="line"><span class="cl">        <span class="n">v_found</span> <span class="o">=</span> <span class="o">-</span><span class="n">count</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">sk1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">v_found</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">SK</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">74</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">SK</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sk1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">quick</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="o">-</span><span class="n">sign</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sk1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">curr</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sk1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">14</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">curr</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">curr</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">quick</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">74</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SK</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">key_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">SK</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">aes_key</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">key_str</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">res</span> <span class="o">=</span> <span class="nb">bytes</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span><span class="n">hex_res</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">iv</span><span class="p">,</span> <span class="n">ct</span> <span class="o">=</span> <span class="n">res</span><span class="p">[:</span><span class="mi">16</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="mi">16</span><span class="p">:]</span>
+</span></span><span class="line"><span class="cl"><span class="n">cipher</span> <span class="o">=</span> <span class="n">AES</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">aes_key</span><span class="p">,</span> <span class="n">AES</span><span class="o">.</span><span class="n">MODE_CBC</span><span class="p">,</span> <span class="n">iv</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">flag</span> <span class="o">=</span> <span class="n">unpad</span><span class="p">(</span><span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ct</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">[+] Success! Flag: </span><span class="si">{</span><span class="n">flag</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p><strong>Flag:</strong> <code>shellmates{Weil_Pairing_and_Frobenius_u_get_torsion_group_Kernel_Sign}</code></p></div><div class="post-footer" id="post-footer">
+    <div class="post-info"><div class="post-info-tag"><span><a href="/tags/isogeny/">Isogeny</a>
+                </span><span><a href="/tags/crypto/">Crypto</a>
+                </span><span><a href="/tags/csidh/">Csidh</a>
+                </span><span><a href="/tags/weil-pairing/">Weil-Pairing</a>
+                </span></div><div class="post-info-line"><div class="post-info-mod">
+                <span>Updated on 2025-12-22</span>
+            </div><div class="post-info-mod"></div>
+        </div></div><div class="post-nav"><a href="/posts/ingeneer/" class="prev" rel="prev" title="Vrai Sahll"><i class="fa-solid fa-angle-left fa-fw"></i>Previous Post</a></div></div>
+</div></article></div>
+            </main>
+            <footer class="footer"><div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.152.2 (6abdacad3f3fe944ea42177844469139e81feda6)">Hugo</a> | Theme - <a href="https://github.com/khusika/FeelIt" target="_blank" rel="noopener noreffer" title="FeelIt 1.0.3"><i class="fa-solid fa-hand-holding-heart fa-fw"></i> FeelIt</a>
+        </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw"></i><span itemprop="copyrightYear">2024 - 2025</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/"></a></span></div>
+</div>
+</footer>
+        </div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fa-solid fa-chevron-up fa-fw"></i>
+            </a></div><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script src="/lib/lazysizes/lazysizes.min.js"></script><script src="/lib/clipboard/clipboard.min.js"></script><script src="/lib/katex/katex.min.js"></script><script src="/lib/katex/auto-render.min.js"></script><script>window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false}};</script><script src="/js/theme.min.js"></script></body></html>
