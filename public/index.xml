@@ -23,5 +23,11 @@
     <pubDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/umass/</guid>
     <description><![CDATA[Exploiting RSA with leaked XOR bits]]></description>
 </item>
+<item>
+    <title>TDS - AES-GCM Authentication Bypass</title>
+    <link>http://localhost:1313/posts/black-hat/</link>
+    <pubDate>Mon, 02 Dec 2024 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/black-hat/</guid>
+    <description><![CDATA[]]></description>
+</item>
 </channel>
 </rss>

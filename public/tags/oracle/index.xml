@@ -1,27 +1,9 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
-        <title>All Posts - </title>
-        <link>http://localhost:1313/posts/</link>
-        <description>All Posts | </description>
-        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 22 Dec 2025 00:00:00 &#43;0000</lastBuildDate><atom:link href="http://localhost:1313/posts/" rel="self" type="application/rss+xml" /><item>
-    <title>Geni</title>
-    <link>http://localhost:1313/posts/bsides/</link>
-    <pubDate>Mon, 22 Dec 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/bsides/</guid>
-    <description><![CDATA[Exploiting a CSI-FiSh variant by tracking torsion points through a sequence of leaked generator images.]]></description>
-</item>
-<item>
-    <title>Vrai Sahll</title>
-    <link>http://localhost:1313/posts/ingeneer/</link>
-    <pubDate>Mon, 26 May 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/ingeneer/</guid>
-    <description><![CDATA[<p>Breaking a hybrid RSA-ECC cryptosystem through weak prime generation.</p>]]></description>
-</item>
-<item>
-    <title>XORSA</title>
-    <link>http://localhost:1313/posts/umass/</link>
-    <pubDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/umass/</guid>
-    <description><![CDATA[Exploiting RSA with leaked XOR bits]]></description>
-</item>
-<item>
+        <title>Oracle - Tag - </title>
+        <link>http://localhost:1313/tags/oracle/</link>
+        <description>Oracle - Tag - </description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 02 Dec 2024 00:00:00 &#43;0000</lastBuildDate><atom:link href="http://localhost:1313/tags/oracle/" rel="self" type="application/rss+xml" /><item>
     <title>TDS - AES-GCM Authentication Bypass</title>
     <link>http://localhost:1313/posts/black-hat/</link>
     <pubDate>Mon, 02 Dec 2024 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/black-hat/</guid>
