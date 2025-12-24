@@ -13,37 +13,7 @@
     <title>TDS - AES-GCM Authentication Bypass</title>
     <link>http://localhost:1313/posts/black-hat/</link>
     <pubDate>Mon, 02 Dec 2024 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/black-hat/</guid>
-    <description><![CDATA[<div class="details admonition info open">
-        <div class="details-summary admonition-title">
-            <i class="icon fa-solid fa-info-circle fa-fw"></i>Challenge Info<i class="details-icon fa-solid fa-angle-right fa-fw"></i>
-        </div>
-        <div class="details-content">
-            <div class="admonition-content"><ul>
-<li><strong>CTF</strong>: blackhat-finals</li>
-<li><strong>Challenge</strong>: TDS</li>
-<li><strong>Category</strong>: Crypto</li>
-<li><strong>Description</strong>: AES-GCM implementation with oracle access</li>
-</ul>
-</div>
-        </div>
-    </div>
-<h2 id="tldr">TL;DR</h2>
-<p>This challenge exploits weaknesses in AES-GCM authentication when given:</p>
-<ol>
-<li>A flag ciphertext and its authentication tag</li>
-<li>Two encryption oracle calls with the same key/nonce</li>
-<li>Unlimited verification oracle with controllable AAD and ciphertext length</li>
-</ol>
-<p>The solution:</p>
-<ol>
-<li>Recovers the GCM mask by encrypting an empty string</li>
-<li>Recovers the authentication key H by solving a polynomial equation</li>
-<li>Brute-forces the keystream byte-by-byte using the verification oracle</li>
-<li>XORs the recovered keystream with the flag ciphertext</li>
-</ol>
-<hr>
-<h2 id="challenge-overview">Challenge Overview</h2>
-<p>The server implements AES-GCM encryption and provides several operations:</p>]]></description>
+    <description><![CDATA[]]></description>
 </item>
 </channel>
 </rss>

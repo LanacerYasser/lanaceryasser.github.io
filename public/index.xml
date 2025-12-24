@@ -3,12 +3,18 @@
         <title></title>
         <link>http://localhost:1313/</link>
         <description>Your blog description</description>
-        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 22 Dec 2025 00:00:00 &#43;0000</lastBuildDate>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 24 Dec 2025 00:00:00 &#43;0000</lastBuildDate>
             <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
         <item>
+    <title>Only-invited party</title>
+    <link>http://localhost:1313/posts/bsides/indit/</link>
+    <pubDate>Wed, 24 Dec 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/bsides/indit/</guid>
+    <description><![CDATA[Exploiting unchecked ecrecover return values and dirty memory in inline assembly to bypass signature verification and steal golden tickets.]]></description>
+</item>
+<item>
     <title>Geni</title>
-    <link>http://localhost:1313/posts/bsides/</link>
-    <pubDate>Mon, 22 Dec 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/bsides/</guid>
+    <link>http://localhost:1313/posts/bsides/geni/</link>
+    <pubDate>Mon, 22 Dec 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/bsides/geni/</guid>
     <description><![CDATA[Exploiting a CSI-FiSh variant by tracking torsion points through a sequence of leaked generator images.]]></description>
 </item>
 <item>
