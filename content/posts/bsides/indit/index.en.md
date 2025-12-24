@@ -29,7 +29,6 @@ resources:
 - **Category**: Blockchain
 - **Description**: BSides Algiers are organizing a party and I didn't get invited. Can you kick the boss and invite me instead??
 - **Author**: 0xbrivan
-- **Difficulty**: Hard
 {{< /admonition >}}
 
 ## Challenge Overview
