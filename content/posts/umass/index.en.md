@@ -5,7 +5,7 @@ draft: false
 author: "Koyphshi"
 description: "Exploiting RSA with leaked XOR bits"
 categories: ["Cryptography"]
-tags: [umass]
+tags: ["rsa", "xor-leak", "coppersmith", "prime-factorization", "lattice-reduction"]
 math: true
 code:
   maxShownLines: 50
