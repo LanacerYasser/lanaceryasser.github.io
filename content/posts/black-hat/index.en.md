@@ -34,17 +34,14 @@ The solution:
 
 The server implements AES-GCM encryption and provides several operations:
 ```python
-# Encrypts the flag with unknown key/nonce
 flag_ciphertext, flag_tag = encrypt(FLAG, key, nonce, b"")
 
-# Gives us 2 encryption oracle calls
 user_plaintext = input("your_text1:")
 ciphertext, tag = encrypt(user_plaintext.encode(), key, nonce, b"")
 
 user_plaintext = input("your_text2:")
 ciphertext, tag = encrypt(user_plaintext.encode(), key, nonce, b"")
 
-# Unlimited verification oracle
 while True:
     length = int(input("length:"))
     aad = base64.b64decode(input("aad: "))
@@ -110,7 +107,6 @@ But since both AAD and ciphertext are empty, $L = 0$, so:
 
 $$\text{tag}_\emptyset = 0 \oplus \text{mask} = \text{mask}$$
 ```python
-# Send empty string as first encryption
 io.sendlineafter(b"your_text1:", b"")
 io.recvuntil(b"tag1: ")
 mask = bytes_to_long(base64.b64decode(io.recvline().strip()))
@@ -138,32 +134,28 @@ $$C_1 \cdot H^{n+1} + C_2 \cdot H^n + \cdots + C_n \cdot H^2 + L \cdot H - \text
 We solve this using SageMath's polynomial root finding:
 ```python
 def recover_h(coeffs, target_val):
-    """
-    Solve: coeffs[0]*H^n + coeffs[1]*H^(n-1) + ... + coeffs[n-1]*H - target_val = 0
-    """
+
     F = GF(2)
     P.<x> = PolynomialRing(F)
-    irr_poly = x^128 + x^7 + x^2 + x + 1  # GCM's irreducible polynomial
+    irr_poly = x^128 + x^7 + x^2 + x + 1
     GFghash.<y> = GF(2^128, modulus=irr_poly)
-    
-    # Build polynomial
+
     poly_terms = []
     for i, c in enumerate(coeffs):
         power = len(coeffs) - i
         poly_terms.append(to_field(c) * y^power)
-    
+
     poly = sum(poly_terms) - to_field(target_val)
     roots = poly.roots()
-    
+
     return from_field(roots[0][0])
 
-# Recover H
 target_val = bytes_to_long(flag_tag) ^ mask
 pad_len = (16 - len(flag_ct) % 16) % 16
 ct_padded = flag_ct + b'\0' * pad_len
 
 coeffs = [bytes_to_long(ct_padded[i:i+16]) for i in range(0, len(ct_padded), 16)]
-coeffs.append((0 << 64) | (len(flag_ct) * 8))  # Length block
+coeffs.append((0 << 64) | (len(flag_ct) * 8))
 
 H = recover_h(coeffs, target_val)
 print(f"[+] Recovered H: {hex(H)}")
@@ -188,7 +180,7 @@ io.recvuntil(b"tag2: ")
 tag2 = bytes_to_long(base64.b64decode(io.recvline().strip()))
 
 keystream = b""
-target_tag = tag2 ^ mask  # Target GHASH value
+target_tag = tag2 ^ mask
 ```
 
 For each byte position $i$:
@@ -210,31 +202,27 @@ for i in range(len(flag_ct)):
     curr_len = i + 1
     n_blocks = (curr_len + 15) // 16
     len_bits_val = (128 << 64) | (curr_len * 8)
-    
-    # Precompute H^(-(n_blocks+2)) for AAD calculation
+
     h_inv = gcm.inv(gcm.pow(H, n_blocks + 2))
-    
+
     for b in range(256):
         guess_ks = keystream + bytes([b])
-        
-        # Calculate GHASH of ciphertext blocks + length
+
         c_padded = guess_ks + b'\0' * ((16 - len(guess_ks) % 16) % 16)
-        
+
         y = 0
         for k in range(0, len(c_padded), 16):
             blk = bytes_to_long(c_padded[k:k+16])
             y = gcm.mul(y ^ blk, H)
-        
+
         y = gcm.mul(y ^ len_bits_val, H)
-        
-        # Calculate required AAD: A = (target ⊕ y) * H^(-(n_blocks+2))
+
         aad_val = gcm.mul(target_tag ^ y, h_inv)
         aad_bytes = long_to_bytes(aad_val, 16).rjust(16, b'\0')
-        
-        # Verify with oracle
+
         io.sendline(str(curr_len).encode())
         io.sendline(base64.b64encode(aad_bytes))
-        
+
         if b"True" in io.recvline():
             keystream += bytes([b])
             print(f"\r[+] Progress: {keystream.hex()}", end="")
@@ -251,7 +239,6 @@ print(f"\n[+] FLAG: {flag.decode()}")
 
 ## Full Solution Script
 ```python
-#!/usr/bin/env python3
 from pwn import *
 from Crypto.Util.number import *
 from Crypto.Util.strxor import strxor
@@ -260,28 +247,28 @@ import sys
 from sage.all import *
 
 class GCMHelper:
-    """Helper for GF(2^128) operations used in GCM"""
+
     def __init__(self):
         F = GF(2)
         P.<x> = PolynomialRing(F)
         self.irr = x^128 + x^7 + x^2 + x + 1
         self.GFghash.<y> = GF(2^128, modulus=self.irr)
-    
+
     def to_field(self, val):
         bits = bin(val)[2:].zfill(128)
         coeffs = [int(b) for b in bits[::-1]]
         return self.GFghash(coeffs)
-    
+
     def from_field(self, elem):
         coeffs = elem.polynomial().list()
         return int(''.join(str(c) for c in coeffs[::-1]), 2)
-    
+
     def mul(self, a, b):
         return self.from_field(self.to_field(a) * self.to_field(b))
-    
+
     def pow(self, base, exp):
         return self.from_field(self.to_field(base) ^ exp)
-    
+
     def inv(self, a):
         return self.from_field(self.to_field(a)^(-1))
 
@@ -299,115 +286,107 @@ def from_field(elem):
     return int(''.join(str(c) for c in coeffs[::-1]), 2)
 
 def recover_h(coeffs, target_val):
-    """
-    Solve polynomial: coeffs[0]*H^n + ... + coeffs[-1]*H - target_val = 0
-    over GF(2^128) to recover authentication key H
-    """
+
     F = GF(2)
     P.<x> = PolynomialRing(F)
     irr_poly = x^128 + x^7 + x^2 + x + 1
     GFghash.<y> = GF(2^128, modulus=irr_poly)
-    
+
     poly_terms = []
     for i, c in enumerate(coeffs):
         power = len(coeffs) - i
         poly_terms.append(to_field(c) * y^power)
-    
+
     poly = sum(poly_terms) - to_field(target_val)
     roots = poly.roots()
-    
+
     if not roots:
         raise ValueError("No roots found!")
-    
+
     return from_field(roots[0][0])
 
 def solve():
     if len(sys.argv) < 3:
         print(f"Usage: {sys.argv[0]} <HOST> <PORT>")
         sys.exit(1)
-    
+
     io = remote(sys.argv[1], int(sys.argv[2]))
     gcm = GCMHelper()
-    
-    # 1. Get Flag Ciphertext and Tag
+
     io.recvuntil(b"flag ciphertext: ")
     flag_ct = base64.b64decode(io.recvline().strip())
     io.recvuntil(b"flag tag: ")
     flag_tag = base64.b64decode(io.recvline().strip())
-    
+
     print(f"[*] Flag ciphertext length: {len(flag_ct)} bytes")
-    
-    # 2. Recover Mask (encrypt empty string)
+
     io.sendlineafter(b"your_text1:", b"")
     io.recvuntil(b"tag1: ")
     mask = bytes_to_long(base64.b64decode(io.recvline().strip()))
     print(f"[+] Recovered mask: {hex(mask)}")
-    
-    # 3. Recover Authentication Key H
+
     target_val = bytes_to_long(flag_tag) ^ mask
-    
+
     pad_len = (16 - len(flag_ct) % 16) % 16
     ct_padded = flag_ct + b'\0' * pad_len
-    
+
     coeffs = [bytes_to_long(ct_padded[i:i+16]) for i in range(0, len(ct_padded), 16)]
     coeffs.append((0 << 64) | (len(flag_ct) * 8))
-    
+
     H = recover_h(coeffs, target_val)
     print(f"[+] Recovered H: {hex(H)}")
-    
-    # 4. Recover Keystream via Oracle
+
     io.sendlineafter(b"your_text2:", b"\x00" * len(flag_ct))
     io.recvuntil(b"tag2: ")
     tag2 = bytes_to_long(base64.b64decode(io.recvline().strip()))
-    
+
     keystream = b""
     target_tag = tag2 ^ mask
-    
+
     print("[*] Brute-forcing keystream byte-by-byte...")
-    
+
     for i in range(len(flag_ct)):
         curr_len = i + 1
         n_blocks = (curr_len + 15) // 16
         len_bits_val = (128 << 64) | (curr_len * 8)
-        
+
         h_inv = gcm.inv(gcm.pow(H, n_blocks + 2))
-        
+
         found = False
         for b in range(256):
             guess_ks = keystream + bytes([b])
-            
+
             c_padded = guess_ks + b'\0' * ((16 - len(guess_ks) % 16) % 16)
-            
+
             y = 0
             for k in range(0, len(c_padded), 16):
                 blk = bytes_to_long(c_padded[k:k+16])
                 y = gcm.mul(y ^ blk, H)
-            
+
             y = gcm.mul(y ^ len_bits_val, H)
-            
+
             aad_val = gcm.mul(target_tag ^ y, h_inv)
             aad_bytes = long_to_bytes(aad_val, 16).rjust(16, b'\0')
-            
+
             io.sendline(str(curr_len).encode())
             io.sendline(base64.b64encode(aad_bytes))
-            
+
             if b"True" in io.recvline():
                 keystream += bytes([b])
                 sys.stdout.write(f"\r[+] Progress: {i+1}/{len(flag_ct)} - {keystream.hex()}")
                 sys.stdout.flush()
                 found = True
                 break
-        
+
         if not found:
             print(f"\n[!] Failed to recover byte at position {i}")
             return
-    
+
     print("\n")
-    
-    # 5. Decrypt Flag
+
     flag = strxor(flag_ct, keystream)
     print(f"[+] FLAG: {flag.decode(errors='ignore')}")
-    
+
     io.close()
 
 if __name__ == "__main__":
