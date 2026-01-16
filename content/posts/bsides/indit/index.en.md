@@ -192,13 +192,10 @@ library ECDSA {
             mstore(add(m, 0x40), r)
             mstore(add(m, 0x60), s)   // Store s at offset 0x60 [!]
 
-            // ⚠️ VULNERABILITY: Ignore the return value of staticcall
             pop(staticcall(gas(), 1, m, 0x80, add(m, 0x40), 0x20))
 
             mstore(add(m, 0x60), 0)
 
-            // This XORs the offset: success → 0x60 ^ 0x20 = 0x40
-            //                        failure → 0x60 ^ 0x00 = 0x60
             result := mload(add(m, xor(0x60, returndatasize())))
         }
     }
@@ -296,15 +293,11 @@ assembly {
     mstore(m, hash)
     mstore(add(m, 0x20), v)
     mstore(add(m, 0x40), r)
-    mstore(add(m, 0x60), s)           // [m+0x60] = s [IMPORTANT]
-
-    // ⚠️ The return value (success/failure) is DISCARDED via pop()
+    mstore(add(m, 0x60), s)           
     pop(staticcall(gas(), 1, m, 0x80, add(m, 0x40), 0x20))
 
     mstore(add(m, 0x60), 0)
 
-    // If success: 0x60 ^ 0x20 = 0x40 → read from output buffer ✓
-    // If failure: 0x60 ^ 0x00 = 0x60 → read from s parameter! ✗
     result := mload(add(m, xor(0x60, returndatasize())))
 }
 ```
