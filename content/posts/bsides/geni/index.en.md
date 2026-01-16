@@ -120,10 +120,10 @@ import hashlib
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 
-primes = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
-          73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151,
-          157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233,
-          239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313, 317,
+primes = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 
+          73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 
+          157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 
+          239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313, 317, 
           331, 337, 347, 349, 353, 359, 367, 373, 587]
 
 p = 4 * prod(primes) - 1
@@ -134,7 +134,7 @@ E0 = EllipticCurve(F, [1, 0])
 def parse_out():
     with open("out.txt", "r") as f:
         data = f.read()
-
+    
     sections = {}
     current = None
     for line in data.split('\n'):
@@ -143,7 +143,7 @@ def parse_out():
             sections[current] = ""
         elif current:
             sections[current] += line
-
+            
     pts_list = sage_eval(sections['Points_list'], locals={'i': i})
     hex_res = sections['Hex result'].strip()
     return pts_list, hex_res
@@ -183,7 +183,7 @@ for idx, l in enumerate(primes):
         if not is_square(rhs):
             Tm = ((p+1)//l) * E0(xr, i * sqrt(-rhs))
             if not Tm.is_zero(): break
-
+            
     def get_uv(T):
         u = T.weil_pairing(Q2, p+1).log(pairing_base)
         v = Q1.weil_pairing(T, p+1).log(pairing_base)
@@ -195,7 +195,7 @@ for idx, l in enumerate(primes):
     v_found = 0
     img1_p = up * P_imgs[1] + vp * PP_imgs[1]
     img1_m = um * P_imgs[1] + vm * PP_imgs[1]
-
+    
     if img1_p.is_zero():
         count = 1
         for j in range(2, 16):
@@ -208,7 +208,7 @@ for idx, l in enumerate(primes):
             if (um * P_imgs[j] + vm * PP_imgs[j]).is_zero(): count += 1
             else: break
         v_found = -count
-
+    
     sk1.append(int(v_found))
 
 SK = [[0]*74]

@@ -158,15 +158,23 @@ import sys
 load('coppersmith.sage')
 
 b = 1024
-xor = 0x64...
-n = 0x46...
-e = 0x10001
-c = 0x38...
+xor = 0x64...        # Leaked XOR of p and q (MSBs)
+n = 0x46...          # RSA modulus
+e = 0x10001          # Public exponent
+c = 0x38...          # Ciphertext
 
 def find(k, p_high, q_high):
-
+    """
+    Recursively recover p and q bit by bit from MSB to LSB
+    
+    Args:
+        k: Current bit position (starts at NBITS-1, decreases)
+        p_high: Recovered bits of p so far
+        q_high: Recovered bits of q so far
+    """
     l = p_high.bit_length()
-
+    
+    # Switch to Coppersmith once we've used all leaked XOR bits
     if k < b//2 - 75:
         l = 512 - 75
         R = 2**l
@@ -190,20 +198,25 @@ def find(k, p_high, q_high):
             pass
         return
 
+    # Extract the XOR bit at position k
     xor_k = (xor >> (k - b//2 + 75)) & 1
-
+    
+    # Determine valid bit pairs
     possibilities = [(0, 0), (1, 1)] if xor_k == 0 else [(0, 1), (1, 0)]
-
+    
     for p_k, q_k in possibilities:
+        # Extend with new bits
         p_high_new = (p_high << 1) | p_k
         q_high_new = (q_high << 1) | q_k
-
+        
+        # Calculate bounds for remaining bits
         m = NBITS - k
         shift = NBITS - m
         min_prod = (p_high_new << shift) * (q_high_new << shift)
-        max_prod = (((p_high_new << shift) + (1 << shift) - 1) *
+        max_prod = (((p_high_new << shift) + (1 << shift) - 1) * 
                     ((q_high_new << shift) + (1 << shift) - 1))
-
+        
+        # Prune if n cannot be achieved
         if min_prod <= n <= max_prod:
             find(k - 1, p_high_new, q_high_new)
 

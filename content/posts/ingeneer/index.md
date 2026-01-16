@@ -65,7 +65,7 @@ def get_flag_value():
 def elliptic_curve_encrypt(flag_val):
     p = getPrime(512)
     q = getPrime(512)
-    modulus = p * q
+    modulus = p * q # ecc_modulus
     y = randint(0, modulus - 1)
     a = randint(1, modulus)
     b = (y**2 - (flag_val**3 + a * flag_val)) % modulus
@@ -166,16 +166,19 @@ Since each byte has the first nibble fixed to 0x3, we only need to brute-force t
 
 ```python
 def bf_2nd_nibbles(N, A, B, n):
-    for x in range(16):
-        for y in range(16):
+    for x in range(16): # Possible values for the 2nd nibble of P
+        for y in range(16): # Possible values for the 2nd nibble of Q
+            # Construct candidate for P's current byte: 0x3X...
             bfA = 0x3 * pow(16, n - 1) + pow(16, n - 2) * x + A
+            # Construct candidate for Q's current byte: 0x3X...
             bfB = 0x3 * pow(16, n - 1) + pow(16, n - 2) * y + B
+            # Check if product matches modulo 16^n
             if bfA * bfB % pow(16, n) == N % pow(16, n):
                 return bfA, bfB
     return None, None
 
 p = q = 0
-for i in range(2, 86, 2):
+for i in range(2, 86, 2): # Recover up to 86 nibbles (43 bytes)
     p, q = bf_2nd_nibbles(rsa_n, p, q, i)
 ```
 
@@ -215,11 +218,12 @@ PR = PolynomialRing(Zmod(rsa_n), names=('x', 'y'))
 f = PR(f)
 x, y = f.parent().gens()
 
+# Find small roots using lattice reduction
 roots = small_roots(f, [R, R], m=3, d=4)
 x_root, y_root = roots[0]
 
 P = int(x_root * R + p)
-Q = rsa_n // P
+Q = rsa_n // P  # Verify: rsa_n % P == 0
 ```
 
 {{< admonition type="note" title="Coppersmith's Theorem" open="true" >}}
@@ -264,13 +268,14 @@ z = PR.gen()
 f = (z + Q) ** 0x10001 - pub
 g = (3 * z**2 + a)**2 - 4 * (z**3 + a * z + b) * (2 * z + point[0])
 
+# Compute polynomial GCD using Euclidean algorithm
 def pgcd(g1, g2):
     return g1.monic() if not g2 else pgcd(g2, g1 % g2)
 
-result = pgcd(f, g)
-m = -result.coefficients()[0]
+result = pgcd(f, g)  # Result is of form (z - m)
+m = -result.coefficients()[0]  # Extract the root
 
-print(long_to_bytes(int(m)))
+print(long_to_bytes(int(m)))  # Reveal the flag!
 ```
 
 {{< admonition type="success" title="Why GCD Works" open="true" >}}
