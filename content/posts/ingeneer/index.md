@@ -4,14 +4,10 @@ date: 2025-05-26T00:00:00+00:00
 draft: false
 author: "Koyphshi"
 summary: "Breaking a hybrid RSA-ECC cryptosystem through weak prime generation. This challenge exploited predictable patterns in RSA prime generation and combined it with elliptic curve mathematics to recover the flag."
-categories: [ctf]
+categories: ["Cryptography"]
 tags: [ingeneer2025]
 
-resources:
-- name: "featured-image-preview"
-  src: "featured-image-preview.webp"
-- name: "featured-image"
-  src: "featured-image.webp"
+
 
 
 

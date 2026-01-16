@@ -4,7 +4,7 @@ date: 2025-12-22T00:00:00+00:00
 draft: false
 author: "Koyphshi"
 description: "Exploiting a CSI-FiSh variant by tracking torsion points through a sequence of leaked generator images."
-categories: [ctf]
+categories: ["Cryptography"]
 tags: [isogeny, crypto, csidh, weil-pairing]
 math: true
 code:
@@ -12,11 +12,7 @@ code:
 toc:
   enable: true
   auto: true
-resources:
-- name: "featured-image-preview"
-  src: "featured-image-preview.webp"
-- name: "featured-image"
-  src: "featured-image.webp"
+
 
 ---
 <!--more-->

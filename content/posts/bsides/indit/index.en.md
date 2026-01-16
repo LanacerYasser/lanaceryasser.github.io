@@ -4,7 +4,7 @@ date: 2025-12-24T00:00:00+00:00
 draft: false
 author: "Koyphshi"
 description: "Exploiting unchecked ecrecover return values and dirty memory in inline assembly to bypass signature verification and steal golden tickets."
-categories: [ctf]
+categories: ["Blockchain"]
 tags: [blockchain, solidity, assembly, ecrecover, evm]
 math: true
 code:
@@ -12,11 +12,7 @@ code:
 toc:
   enable: true
   auto: true
-resources:
-- name: "featured-image-preview"
-  src: "featured-image-preview.webp"
-- name: "featured-image"
-  src: "featured-image.webp"
+
 ---
 
 <!--more-->

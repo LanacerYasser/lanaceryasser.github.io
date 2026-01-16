@@ -1,12 +1,12 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
-        <title>Isogeny - Tag - </title>
-        <link>http://localhost:1313/tags/isogeny/</link>
-        <description>Isogeny - Tag - </description>
-        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 22 Dec 2025 00:00:00 &#43;0000</lastBuildDate><atom:link href="http://localhost:1313/tags/isogeny/" rel="self" type="application/rss+xml" /><item>
+        <title>Isogeny - Tag - Koyphshi</title>
+        <link>http://localhost:32781/tags/isogeny/</link>
+        <description>Isogeny - Tag - Koyphshi</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 22 Dec 2025 00:00:00 &#43;0000</lastBuildDate><atom:link href="http://localhost:32781/tags/isogeny/" rel="self" type="application/rss+xml" /><item>
     <title>Geni</title>
-    <link>http://localhost:1313/posts/bsides/</link>
-    <pubDate>Mon, 22 Dec 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/bsides/</guid>
+    <link>http://localhost:32781/posts/geni/</link>
+    <pubDate>Mon, 22 Dec 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:32781/posts/geni/</guid>
     <description><![CDATA[Exploiting a CSI-FiSh variant by tracking torsion points through a sequence of leaked generator images.]]></description>
 </item>
 </channel>

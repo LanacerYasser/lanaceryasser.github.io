@@ -1,0 +1,210 @@
+/* ============================================
+   CLEAN BLOG CARD STYLING
+   Single column, dark boxes, centered titles
+   ============================================ */
+
+/* Import clean font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ============================================
+   Post Cards Container - SINGLE COLUMN
+   ============================================ */
+.summary-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 0;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* ============================================
+   Individual Post Card - Dark Box
+   ============================================ */
+.summary {
+    background: rgba(30, 30, 45, 0.95);
+    border-radius: 12px;
+    border: 1px solid rgba(60, 60, 80, 0.5);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    padding: 24px;
+    margin: 0;
+    transition: all 0.3s ease;
+}
+
+.summary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border-color: rgba(100, 100, 130, 0.6);
+}
+
+/* Dark mode */
+[theme=dark] .summary {
+    background: rgba(20, 20, 32, 0.95);
+    border-color: rgba(50, 50, 70, 0.6);
+}
+
+/* ============================================
+   Hide Featured Images
+   ============================================ */
+.summary .featured-image-preview,
+.summary .featured-image-placeholder {
+    display: none;
+}
+
+/* ============================================
+   Post Title - CENTERED, Clear Font
+   ============================================ */
+.summary .single-title {
+    margin: 0 0 16px 0;
+    padding: 0;
+    text-align: center;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.summary .single-title a {
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.summary .single-title a:hover {
+    color: #818cf8;
+}
+
+/* ============================================
+   Hide Post Meta (published in, category)
+   ============================================ */
+.summary .post-meta {
+    display: none;
+}
+
+/* ============================================
+   Post Summary/Excerpt - Clear Text
+   ============================================ */
+.summary a.content {
+    display: block;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #c0c0d8;
+    text-decoration: none;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.summary a.content:hover {
+    color: #e0e0f0;
+}
+
+/* ============================================
+   Tags - Centered Pills
+   ============================================ */
+.summary .post-footer {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.summary .post-tags {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.summary .post-tags li {
+    margin: 0;
+}
+
+.summary .post-tags a {
+    display: inline-block;
+    padding: 5px 14px;
+    background: rgba(99, 102, 241, 0.2);
+    color: #a78bfa;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.summary .post-tags a:hover {
+    background: #6366f1;
+    color: #ffffff;
+}
+
+/* ============================================
+   Pin Icon
+   ============================================ */
+.summary .pin-icon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.summary .pin-icon i {
+    color: white;
+    font-size: 0.7rem;
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+@media (max-width: 768px) {
+    .summary-card {
+        padding: 16px;
+    }
+
+    .summary {
+        padding: 20px;
+    }
+
+    .summary .single-title {
+        font-size: 1.1rem;
+    }
+}
+
+/* ============================================
+   Center images in blog posts
+   ============================================ */
+.content img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* ============================================
+   Pagination
+   ============================================ */
+.pagination .page-item .page-link {
+    background: rgba(30, 30, 45, 0.95);
+    border: 1px solid rgba(60, 60, 80, 0.5);
+    border-radius: 8px;
+    color: #c0c0d8;
+    padding: 8px 14px;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-item .page-link:hover,
+.pagination .page-item.active .page-link {
+    background: #6366f1;
+    color: white;
+    border-color: #6366f1;
+}

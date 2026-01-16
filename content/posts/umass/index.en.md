@@ -4,7 +4,7 @@ date: 2025-04-21T00:00:00+00:00
 draft: false
 author: "Koyphshi"
 description: "Exploiting RSA with leaked XOR bits"
-categories: [ctf]
+categories: ["Cryptography"]
 tags: [umass]
 math: true
 code:
@@ -12,12 +12,6 @@ code:
 toc:
   enable: true
   auto: true
-resources:
-- name: "featured-image-preview"
-  src: "featured-image-preview.webp"
-- name: "featured-image"
-  src: "featured-image.webp"
-
 
 ---
 

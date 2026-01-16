@@ -1,14 +1,10 @@
 ---
-title: "TDS - AES-GCM Authentication Bypass"
-date: 2024-12-02T00:00:00+00:00
+title: "TDS"
+date: 2025-01-16T00:00:00+00:00
 draft: false
 tags: ["blackhat-finals", "crypto", "aes-gcm", "polynomial", "oracle"]
-categories: ["CTF Writeups"]
-resources:
-- name: "featured-image-preview"
-  src: "featured-image-preview.webp"
-- name: "featured-image"
-  src: "featured-image.webp"
+categories: ["Cryptography"]
+
 ---
 
 <!--more-->

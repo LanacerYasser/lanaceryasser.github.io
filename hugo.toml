@@ -1,21 +1,44 @@
 baseURL = "https://lanaceryasser.github.io/"
-title = ""
+title = "Koyphshi"
 languageCode = "en"
 defaultContentLanguage = "en"
 theme = "FeelIt"
 
 # Enable GitInfo for last modified dates
-enableGitInfo = false 
+enableGitInfo = false
 
-[cashes] 
-  [cashes.images]
-    dir = 'cashDir/images'
+# Enable emoji support
+enableEmoji = true
+
+# Enable robots.txt generation
+enableRobotsTXT = true
+
+# Pagination configuration
+[pagination]
+  pagerSize = 6
+
+[caches]
+  [caches.images]
+    dir = ":resourceDir/_gen"
+    maxAge = "24h"
+
 [params]
   version = "1.0.X"
-  description = "Your blog description"
-  keywords = ["blog", "tech", "your keywords"]
-  defaultTheme = "auto"  # auto, light, dark
+  description = "Koyphshi - My Personal Blog"
+  keywords = ["blog", "tech", "programming", "development"]
+  defaultTheme = "dark"  # auto, light, dark
+  avatar = "peak.jpeg"
   
+  # Fingerprint for cache busting
+  fingerprint = ""
+  
+  # Date format
+  dateFormat = "2006-01-02"
+  
+  # Website images for Open Graph and Twitter Cards
+  images = ["/images/avatar.jpeg"]
+  
+  # Header configuration
   [params.header]
     desktopMode = "sticky"
     mobileMode = "auto"
@@ -26,10 +49,8 @@ enableGitInfo = false
       pre = ""
       post = ""
       typeit = false
-
-  [params.page.math]
-  enable = true 
-
+  
+  # Footer configuration
   [params.footer]
     enable = true
     custom = ""
@@ -37,44 +58,170 @@ enableGitInfo = false
     copyright = true
     author = true
     since = 2024
-
+    
+  # Home page configuration
   [params.home]
+    # RSS
+    rss = 10
+    
     [params.home.profile]
       enable = true
-      avatarURL = "/images/avatar.jpeg"
+      avatarURL = "/avatar/peak.jpeg"
       title = "Koyphshi"
       subtitle = "ps ps ps"
       typeit = true
       social = true
+      disclaimer = ""
       
     [params.home.posts]
       enable = true
       paginate = 6
-      imagePreview = true
-
+      defaultHiddenFromHomePage = false
+  
+  # Social configuration
   [params.social]
     GitHub = "LanacerYasser"
     LinkedIn = "https://www.linkedin.com/in/yasser-lanacer-1903442a8/"
-    # Add more social links
+    Twitter = ""
+    Email = ""
+    RSS = true
+  
+  # Page configuration
+  [params.page]
+    hiddenFromHomePage = false
+    hiddenFromSearch = false
+    twemoji = false
+    lightgallery = false
+    ruby = true
+    fraction = true
+    fontawesome = true
+    linkToMarkdown = true
+    rssFullText = false
+    
+    [params.page.toc]
+      enable = true
+      keepStatic = false
+      auto = true
+    
+    [params.page.math]
+      enable = true
+      blockLeftDelimiter = ""
+      blockRightDelimiter = ""
+      inlineLeftDelimiter = ""
+      inlineRightDelimiter = ""
+      copyTex = true
+      mhchem = true
+    
+    [params.page.code]
+      copy = true
+      maxShownLines = 20
+    
+    [params.page.share]
+      enable = true
+      Twitter = true
+      Facebook = true
+      Linkedin = true
+      Reddit = true
+    
+    [params.page.comment]
+      enable = false
+      # Disqus, Gitalk, Valine, etc. can be configured here
+  
+  # SEO configuration
+  [params.seo]
+    image = "/images/avatar.jpeg"
+    thumbnailUrl = "/images/avatar.jpeg"
+  
+  # Analytics (optional)
+  [params.analytics]
+    enable = false
+    [params.analytics.google]
+      id = ""
+  
+  # Search configuration
+  [params.search]
+    enable = true
+    type = "lunr"  # algolia, fuse, lunr
+    contentLength = 4000
+    placeholder = ""
+    maxResultLength = 10
+    snippetLength = 30
+    highlightTag = "em"
+    absoluteURL = false
+    
+    [params.search.algolia]
+      index = ""
+      appID = ""
+      searchKey = ""
+  
+  # Custom CSS/JS
+  [params.page.library]
+    [params.page.library.css]
+      # Load custom CSS - place your custom.css in static/css/
+      custom = "/css/custom.css"
+    [params.page.library.js]
+      # Load custom JS if needed
+      # custom = "/js/custom.js"
 
+# Menu configuration
 [menu]
   [[menu.main]]
     identifier = "posts"
     name = "Posts"
     url = "/posts/"
     weight = 1
- [[menu.main]]
+    
+  [[menu.main]]
     identifier = "categories"
     name = "Categories"
     url = "/categories/"
-    weight = 3
+    weight = 2
+    
   [[menu.main]]
     identifier = "tags"
-    name = "tags"
+    name = "Tags"
     url = "/tags/"
     weight = 3
- 
 
+# Markup configuration
 [markup]
   [markup.highlight]
     noClasses = false
+    lineNos = true
+    lineNumbersInTable = true
+    style = "monokai"
+    
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+      
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 6
+
+# Params Author configuration (replaces deprecated [author])
+[params.author]
+  name = "Koyphshi"
+  email = ""
+  link = ""
+
+# Sitemap configuration
+[sitemap]
+  changefreq = "weekly"
+  filename = "sitemap.xml"
+  priority = 0.5
+
+# Permalinks configuration
+[Permalinks]
+  posts = "/posts/:filename/"
+
+# Privacy configuration
+[privacy]
+  [privacy.twitter]
+    enableDNT = true
+  [privacy.youtube]
+    privacyEnhanced = true
+
+# Output formats
+[outputs]
+  home = ["HTML", "RSS", "JSON"]

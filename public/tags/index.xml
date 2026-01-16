@@ -1,123 +1,116 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on </title>
-    <link>http://localhost:1313/tags/</link>
-    <description>Recent content in Tags on </description>
+    <title>Tags on Koyphshi</title>
+    <link>http://localhost:32781/tags/</link>
+    <description>Recent content in Tags on Koyphshi</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Wed, 24 Dec 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:32781/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Assembly</title>
-      <link>http://localhost:1313/tags/assembly/</link>
+      <link>http://localhost:32781/tags/assembly/</link>
       <pubDate>Wed, 24 Dec 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/assembly/</guid>
+      <guid>http://localhost:32781/tags/assembly/</guid>
       <description></description>
     </item>
     <item>
       <title>Blockchain</title>
-      <link>http://localhost:1313/tags/blockchain/</link>
+      <link>http://localhost:32781/tags/blockchain/</link>
       <pubDate>Wed, 24 Dec 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/blockchain/</guid>
+      <guid>http://localhost:32781/tags/blockchain/</guid>
       <description></description>
     </item>
     <item>
       <title>Ecrecover</title>
-      <link>http://localhost:1313/tags/ecrecover/</link>
+      <link>http://localhost:32781/tags/ecrecover/</link>
       <pubDate>Wed, 24 Dec 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/ecrecover/</guid>
+      <guid>http://localhost:32781/tags/ecrecover/</guid>
       <description></description>
     </item>
     <item>
       <title>Evm</title>
-      <link>http://localhost:1313/tags/evm/</link>
+      <link>http://localhost:32781/tags/evm/</link>
       <pubDate>Wed, 24 Dec 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/evm/</guid>
+      <guid>http://localhost:32781/tags/evm/</guid>
       <description></description>
     </item>
     <item>
       <title>Solidity</title>
-      <link>http://localhost:1313/tags/solidity/</link>
+      <link>http://localhost:32781/tags/solidity/</link>
       <pubDate>Wed, 24 Dec 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/solidity/</guid>
+      <guid>http://localhost:32781/tags/solidity/</guid>
       <description></description>
     </item>
     <item>
       <title>Crypto</title>
-      <link>http://localhost:1313/tags/crypto/</link>
+      <link>http://localhost:32781/tags/crypto/</link>
       <pubDate>Mon, 22 Dec 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/crypto/</guid>
+      <guid>http://localhost:32781/tags/crypto/</guid>
       <description></description>
     </item>
     <item>
       <title>Csidh</title>
-      <link>http://localhost:1313/tags/csidh/</link>
+      <link>http://localhost:32781/tags/csidh/</link>
       <pubDate>Mon, 22 Dec 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/csidh/</guid>
+      <guid>http://localhost:32781/tags/csidh/</guid>
       <description></description>
     </item>
     <item>
       <title>Isogeny</title>
-      <link>http://localhost:1313/tags/isogeny/</link>
+      <link>http://localhost:32781/tags/isogeny/</link>
       <pubDate>Mon, 22 Dec 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/isogeny/</guid>
+      <guid>http://localhost:32781/tags/isogeny/</guid>
       <description></description>
     </item>
     <item>
       <title>Weil-Pairing</title>
-      <link>http://localhost:1313/tags/weil-pairing/</link>
+      <link>http://localhost:32781/tags/weil-pairing/</link>
       <pubDate>Mon, 22 Dec 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/weil-pairing/</guid>
+      <guid>http://localhost:32781/tags/weil-pairing/</guid>
       <description></description>
     </item>
     <item>
       <title>Ingeneer2025</title>
-      <link>http://localhost:1313/tags/ingeneer2025/</link>
+      <link>http://localhost:32781/tags/ingeneer2025/</link>
       <pubDate>Mon, 26 May 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/ingeneer2025/</guid>
+      <guid>http://localhost:32781/tags/ingeneer2025/</guid>
       <description></description>
     </item>
     <item>
       <title>Umass</title>
-      <link>http://localhost:1313/tags/umass/</link>
+      <link>http://localhost:32781/tags/umass/</link>
       <pubDate>Mon, 21 Apr 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/umass/</guid>
+      <guid>http://localhost:32781/tags/umass/</guid>
       <description></description>
     </item>
     <item>
       <title>Aes-Gcm</title>
-      <link>http://localhost:1313/tags/aes-gcm/</link>
-      <pubDate>Mon, 02 Dec 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/aes-gcm/</guid>
+      <link>http://localhost:32781/tags/aes-gcm/</link>
+      <pubDate>Thu, 16 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:32781/tags/aes-gcm/</guid>
       <description></description>
     </item>
     <item>
       <title>Blackhat-Finals</title>
-      <link>http://localhost:1313/tags/blackhat-finals/</link>
-      <pubDate>Mon, 02 Dec 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/blackhat-finals/</guid>
+      <link>http://localhost:32781/tags/blackhat-finals/</link>
+      <pubDate>Thu, 16 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:32781/tags/blackhat-finals/</guid>
       <description></description>
     </item>
     <item>
       <title>Oracle</title>
-      <link>http://localhost:1313/tags/oracle/</link>
-      <pubDate>Mon, 02 Dec 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/oracle/</guid>
+      <link>http://localhost:32781/tags/oracle/</link>
+      <pubDate>Thu, 16 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:32781/tags/oracle/</guid>
       <description></description>
     </item>
     <item>
       <title>Polynomial</title>
-      <link>http://localhost:1313/tags/polynomial/</link>
-      <pubDate>Mon, 02 Dec 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/polynomial/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Signature-Spoofing</title>
-      <link>http://localhost:1313/tags/signature-spoofing/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/signature-spoofing/</guid>
+      <link>http://localhost:32781/tags/polynomial/</link>
+      <pubDate>Thu, 16 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:32781/tags/polynomial/</guid>
       <description></description>
     </item>
   </channel>

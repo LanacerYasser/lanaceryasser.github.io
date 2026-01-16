@@ -1,0 +1,85 @@
+baseURL = "https://lanaceryasser.github.io/"
+title = "Koyphshi (Dark Mode)"
+languageCode = "en"
+defaultContentLanguage = "en"
+theme = "reimu"
+
+enableEmoji = true
+enableRobotsTXT = true
+
+[params]
+  author = "Koyphshi"
+  description = "Koyphshi - My Personal Blog (Dark & Premium)"
+  subtitle = "Coding in the shadows..."
+  avatar = "peak.jpeg"
+  banner = "/images/banner.png"
+  cover = "/images/default-cover.png"
+  mainSections = ["posts", "post"]
+  
+  # Forced Dark Mode
+  [params.dark_mode]
+    enable = true
+  
+  # Animation
+  [params.animation]
+    enable = true
+
+  # Reimu specific params
+  yearFormat = "2006"
+  monthFormat = "2006-01"
+  dateFormat = "2006-01-02"
+  timeFormat = "2006-01-02 15:04:05"
+  
+  excerpt_link = "Read More"
+  
+  # Sidebar Configuration
+  widgets = ["category", "recent_posts"]
+  
+  [params.sidebar]
+    position = "right"
+    menu = true
+    [params.sidebar.article]
+      show_common = true
+
+  [params.social]
+    github = "https://github.com/LanacerYasser"
+    linkedin = "https://www.linkedin.com/in/yasser-lanacer-1903442a8/"
+
+  # Navigation
+  [[params.menu]]
+    name = "home"
+    url = "/"
+  [[params.menu]]
+    name = "archives"
+    url = "/archives"
+  [params.layout]
+  max_width = "1600px"
+
+[params.internal_theme.dark]
+    "--red-0" = "#00d2ff"
+    "--red-1" = "#00a8cc"
+    "--red-2" = "#007fa3"
+    "--red-3" = "#00567a"
+    "--red-4" = "rgba(0, 210, 255, 0.5)"
+    "--red-5" = "rgba(0, 168, 204, 0.15)"
+    "--red-5-5" = "rgba(0, 127, 163, 0.05)"
+    "--red-6" = "rgba(0, 210, 255, 0.2)"
+    "--color-red-6-shadow" = "rgba(0, 210, 255, 0.6)"
+    "--color-red-3-shadow" = "rgba(0, 210, 255, 0.3)"
+    "--highlight-nav" = "#0a0c10"
+    "--highlight-background" = "#0d1117"
+    "--highlight-foreground" = "#c9d1d9"
+    "--color-border" = "#1b2735"
+    "--color-link" = "#00d2ff"
+    "--color-h2-after" = "#00d2ff"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+[Permalinks]
+  posts = "/posts/:filename/"
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
