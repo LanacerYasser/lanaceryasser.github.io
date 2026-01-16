@@ -1,12 +1,12 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
         <title>Lattice-Reduction - Tag - Koyphshi</title>
-        <link>http://localhost:1313/tags/lattice-reduction/</link>
+        <link>http://localhost:32781/tags/lattice-reduction/</link>
         <description>Lattice-Reduction - Tag - Koyphshi</description>
-        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</lastBuildDate><atom:link href="http://localhost:1313/tags/lattice-reduction/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</lastBuildDate><atom:link href="http://localhost:32781/tags/lattice-reduction/" rel="self" type="application/rss+xml" /><item>
     <title>XORSA</title>
-    <link>http://localhost:1313/posts/umass/</link>
-    <pubDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:1313/posts/umass/</guid>
+    <link>http://localhost:32781/posts/umass/</link>
+    <pubDate>Mon, 21 Apr 2025 00:00:00 &#43;0000</pubDate><guid>http://localhost:32781/posts/umass/</guid>
     <description><![CDATA[Exploiting RSA with leaked XOR bits]]></description>
 </item>
 </channel>
