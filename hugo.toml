@@ -81,7 +81,7 @@ enableRobotsTXT = true
   # Social configuration
   [params.social]
     GitHub = "LanacerYasser"
-    LinkedIn = "https://www.linkedin.com/in/yasser-lanacer-1903442a8/"
+    LinkedIn = "yasser-lanacer-1903442a8/"
     Twitter = ""
     Email = ""
     RSS = true
