@@ -1,7 +1,7 @@
 ---
 title: "Vrai Sahl"
 date: 2025-05-26T00:00:00+00:00
-draft: false
+draft: true
 author: "Koyphshi"
 summary: "Breaking a hybrid RSA-ECC cryptosystem through weak prime generation. This challenge exploited predictable patterns in RSA prime generation and combined it with elliptic curve mathematics to recover the flag."
 categories: ["Cryptography"]
